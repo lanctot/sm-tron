@@ -1,0 +1,19 @@
+
+\subsection{Selection}
+\label{subsec:selection}
+In the selection phase, a child node of a node is selected. It starts from the root node and is repeated until a leaf node is reached. From a leaf node the play-out starts to evaluate all the nodes, which were selected during the selection phase. The selection of a child node is done according to a certain strategy. The most basic strategy is to choose a random child node. More sophisticated selection strategies, which try to find the right balance between exploration, select unknown nodes, and exploitation, select the most promising nodes, are introduced in Section~\ref{sec:selection_strategies}. The balance between exploration and exploitation is important, because if the strategy would focus purely on exploitation, some promising nodes/moves might not get discovered. If the strategy focuses only on exploration, many more nodes/moves will be discovered, but the really promising nodes/moves will not be identified as such. Thus, the correct balance between exploration and exploitation is important.
+
+\subsection{Play-Out}
+\label{subsec:play_out}
+After a leaf node is reached, the play-out starts to evaluate the leaf node and all the nodes visited before in the selection phase. The play-out is a simulated game, where each move is made according to a strategy. The most basic strategy is, again, a random strategy, where a random move is selected of a set of moves, excluding the moves which will lead to a immediate crash.\\
+The play-out is finished when either one of the players, or both, dies or if a position already reveals the winner, i.e. when both players are cut off from each other and both players are only able to fill the remaining space, then the player with the bigger space wins. This is explained in more detail in Subsection~\ref{subsec:heuristic_knowledge}. This is done, because it saves time, which can be used to make more simulations. The play-out will return 1, 0.5 or 0 for a win, a draw or a loss, respectively.
+
+\subsection{Expansion}
+\label{subsec:expansion}
+After the play-out is performed, the node, which was first encountered in the play-out becomes the child node of the leaf node, which was reached by the selection strategy. This is the expansion phase.\\
+In games with a fairly low branching factor (only a few child nodes are possible) all the child nodes can be added. The game of Tron has a maximum branching factor of three (go straight, go left, go right), therefore all child nodes are always added, with the exception of suicide moves.\\
+An enhancement can be made to the expansion phase that makes use of some heuristic knowledge, which is introduced in Subsection~\ref{subsec:heuristic_knowledge}, called the predictive expansion strategy. The predictive expansion strategy is explained in detail in Subsection~\ref{subsec:pes}.
+
+\subsection{Backpropagation}
+\label{subsec:backpropagation}
+Following the expansion, the result of the play-out is back propagated to each node, which was visited in the selection phase, until the root node. This has to be done, because when starting over again with the selection phase, each node has to be updated with the new values of the last play-out. When the root node is reached, the first phase starts again.
