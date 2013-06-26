@@ -64,7 +64,7 @@
 %environment. Please start the first paragraph of your abstract with a \verb+\noindent+ command.
 
 \begin{abstract}
-\noindent This paper investigates the application of Monte Carlo Tree Search (MCTS) to simultaneous move games. MCTS has been successfully applied to many board games, such as Chess, Checkers and Go. In this paper several variants of MCTS are investigated in order to adapt MCTS to simultaneous move games. Through the experiments, which will be conducted in the test domain in the game of Tron on four different boards, it is shown, that deterministic selection strategies such as sequential UCT, UCB1-Tuned and Decoupled UCT are superior to stochastic selection strategies, such as EXP3, Regret Matching and Decoupled UCT(mix).
+\noindent This paper investigates the application of Monte Carlo Tree Search (MCTS) to simultaneous move games. MCTS has been successfully applied to many board games, such as Chess, Checkers and Go. In this paper several variants of MCTS are investigated in order to adapt MCTS to simultaneous move games. Through the experiments, which will be conducted in the test domain in the game of Tron on four different boards, it is shown, that deterministic selection strategies such as sequential UCT, UCB1-Tuned and Decoupled UCT are superior to stochastic selection strategies, such as Exp3, Regret Matching and Decoupled UCT(mix).
 \end{abstract}
 
 \section{Introduction}
@@ -77,7 +77,7 @@ Classic examples include Chess, Checkers and Go, each of which are simple to lea
 In classical game tree search, game-specific knowledge is used to determine the strength of each position using a static evaluation function. %~\cite{ai_russel_norvig}. 
 If the evaluation function is too complex or a large search tree is required, then either the search has to be increased an alternative approach can be chosen. 
 
-Monte Carlo Tree Search (MCTS)~\cite{chaslot_phd,coulom,kocsis} builds up a search tree without requiring an evaluation function. Instead, it builds the search tree by repeating four phases, as explained below. MCTS was initially applied to the game of Go~\cite{coulom} but has since been applied to many different games and settings~\cite{mctssurvey}. This paper focuses on sampling policies and update rules in MCTS applies to two-player turn-taking simultaneous move games, such as Tron. Some algorithms are investigated in this paper, including sequential UCT~\cite{kocsis} are: UCB1-Tuned, Decoupled UCT, Decoupled UCB1-Tuned EXP3 and Regret Matching.
+Monte Carlo Tree Search (MCTS)~\cite{chaslot_phd,coulom,kocsis} builds up a search tree without requiring an evaluation function. Instead, it builds the search tree by repeating four phases, as explained below. MCTS was initially applied to the game of Go~\cite{coulom} but has since been applied to many different games and settings~\cite{mctssurvey}. This paper focuses on sampling policies and update rules in MCTS applies to two-player turn-taking simultaneous move games, such as Tron. Some algorithms are investigated in this paper, including sequential UCT~\cite{kocsis} are: UCB1-Tuned, Decoupled UCT, Decoupled UCB1-Tuned Exp3 and Regret Matching.
 %This paper deals with MCTS, but not on the aspect of turn-taking board games, but on the application of it to simultaneous move games, such as Tron. 
 
 In Tron, two players move at the same time through a discrete grid and at each move create a wall behind them. 
@@ -264,7 +264,7 @@ In standard Exp3, $\omega(a^p_k) = \hat{X}_{a^p_k}$, but in practice we use $\om
 The action selected is then sampled from the mixed strategy where action $a^p_k$ is selected with probability $\sigma_{a^{p}_{k}}=(1-\gamma)  P_{a^{p}_{k}} + \frac{\gamma}{|K_{p}|}$.
 
 %Since Equation~\ref{exp3_policy} leads to numerical instability, Equations~\ref{exp3_policy_new} and~\ref{exp3_policy_weight} are used instead. From this policy, a probability $\sigma_{a^{p}_{k}}$ is computed (See Equation~\ref{exp3_distribution}) from which a mixed strategy is played. 
-%Otherwise $\eta$ can be tuned to increase the performance of EXP3.
+%Otherwise $\eta$ can be tuned to increase the performance of Exp3.
 
 %\begin{equation}\label{exp3_policy_weight}
 %\omega(a^{p}_{k})=\hat{X}_{a^{p}_{k}}-argmax_{i \in A_{p}}\hat{X}_{a^{p}_{i}}
@@ -279,7 +279,7 @@ The action selected is then sampled from the mixed strategy where action $a^p_k$
 Parameter $\gamma$ can be optimized by tuning it. The update of $\hat{X}_{p}(a_{n})$ after selecting a joint action $(a_{1},a_{2})$, by using the probability $\sigma_{i}(a_{j})$, which returned some simulation result of a play-out $r^{p}_{a_{k_{1}},a_{k_{2}}}$ is given in Equation~\ref{exp3_equations}.
 As in DUCT(mix), the final move is sampled from the normalized visit count distribution.
 
-%The final move is chosen in the same way as it was in DUCT(Mix).
+%The final move is chosen in the same way as it was in DUCT(mix).
 
 
 \subsection{Regret Matching}
@@ -317,7 +317,7 @@ where the variable $\gamma$ can be tuned to increase performance as in Exp3.
 %\end{equation}
 
 Initially, all values in matrix $M$ and all values in the regret lists are set to zero. After the play-out is finished and the result ($r^{p}_{a_{m},a_{n}}$) of it gets back propagated, the cumulative reward values for each cell are updated using $X_{m,n} = X_{m,n} + r^{p}_{a^{1}_{m},a^{2}_{n}}$ and the regret values are updated using the right side of Equation~\ref{rm_equations}.
-The final move is selected as in DUCT(Mix) and EXP3 by using a mixed strategy by normalizing over the visit counts. 
+The final move is selected as in DUCT(mix) and Exp3 by using a mixed strategy by normalizing over the visit counts. 
 
 %\begin{equation}\label{update_matrix}
 %\begin{align}
@@ -335,7 +335,7 @@ The final move is selected as in DUCT(Mix) and EXP3 by using a mixed strategy by
 \label{sec:experiments}
 
 In this section the different selection and strategies are evaluated. 
-%Because the framework, which was implemented by Teuling~\cite{teuling_tron}, used for this experiments is based on sequential UCT, DUCT, EXP3 and Regret Matching were not optimally implemented. 
+%Because the framework, which was implemented by Teuling~\cite{teuling_tron}, used for this experiments is based on sequential UCT, DUCT, Exp3 and Regret Matching were not optimally implemented. 
 %Therefore it would be an unfair comparison, if all agents would have the same thinking time. 
 In order to make it a fair comparison using a common framework, each agent is allowed to simulate a fixed number of simulations (100,000). 
 %In the case of this experiment the number is set to 100,000. 
@@ -359,13 +359,13 @@ The play-out strategy, which is used in all experiments, is the random strategy 
 %\begin{table}[b]
 \centering
 \footnotesize
-%\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the EXP3 algorithm}
+%\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the Exp3 algorithm}
 \begin{tabular}{|c||c|c|}
 							\hline
 Parameter			& Reference constant		& Tuned value	\\ \hline\hline
 $C$				& 10~\cite{teuling_tron}	& 13.2		\\ \hline
 $T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
-$\gamma$(EXP3)			& 0.36~\cite{cig_paper}		& 0.39		\\ \hline
+$\gamma$(Exp3)			& 0.36~\cite{cig_paper}		& 0.39		\\ \hline
 $\gamma$(Regret Matching)	& 0.36				& 0.31		\\ \hline
 \end{tabular}
 %\label{table:parameter_tuning}
@@ -378,50 +378,50 @@ $\gamma$(Regret Matching)	& 0.36				& 0.31		\\ \hline
 \centering
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board a 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board a 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& Exp3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 61\%		& 51\% 		& 54\%		& 53\%		& 67\%		& 65\%	& 62\%				\\ 	\hline
   UCB1T 		& 39\% 	& - 		& 53\%		& 61\%		& 52\%		& 65\%		& 66\%	& 61\%				\\ 	\hline
   DUCT(max) 		& 49\% 	& 47\%		& -		& 67\%		& 43\%		& 62\%		& 63\%	& 67\%				\\ 	\hline
   DUCT(mix) 		& 46\% 	& 39\% 		& 33\%		& -		& 37\%		& 48\%		& 53\%	& 51\%				\\ 	\hline
   DUCB1T(max)	 	& 47\% 	& 48\% 		& 57\%		& 63\%		& -		& 61\%		& 64\%	& 69\%				\\ 	\hline
   DUCB1T(mix)	 	& 33\% 	& 35\% 		& 38\%		& 52\%		& 39\%		& -		& 54\%	& 51\%				\\ 	\hline
-  EXP3 			& 35\% 	& 34\% 		& 37\%		& 47\%		& 36\%		& 46\%		& -	& 51\%				\\ 	\hline
+  Exp3 			& 35\% 	& 34\% 		& 37\%		& 47\%		& 36\%		& 46\%		& -	& 51\%				\\ 	\hline
   RM		 	& 38\%	& 39\% 		& 33\%		& 49\%		& 31\%		& 49\%		& 49\%	& -				\\ 	\hline
 \end{tabular}
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board b 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board b 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& Exp3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 47\%		& 49\%		& 57\%		& 51\%		& 61\%		& 61\%	& 59\%				\\ 	\hline
   UCB1T 		& 53\% 	& - 		& 51\%		& 54\%		& 49\%		& 65\%		& 64\%	& 57\%				\\ 	\hline
   DUCT(max) 		& 51\% 	& 49\% 		& -		& 54\%		& 51\%		& 58\%		& 54\%	& 52\%				\\ 	\hline
   DUCT(mix) 		& 43\%	& 46\% 		& 46\%		& -		& 41\%		& 52\%		& 49\%	& 46\%				\\ 	\hline
   DUCB1T(max)	 	& 49\% 	& 51\% 		& 49\%		& 59\%		& -		& 68\%		& 62\%	& 65\%				\\ 	\hline
   DUCB1T(mix)	 	& 39\% 	& 35\% 		& 42\%		& 48\%		& 32\%		& -		& 57\%	& 52\%				\\ 	\hline
-  EXP3 			& 39\% 	& 36\% 		& 46\%		& 51\%		& 38\%		& 43\%		& -	& 57\%				\\ 	\hline
+  Exp3 			& 39\% 	& 36\% 		& 46\%		& 51\%		& 38\%		& 43\%		& -	& 57\%				\\ 	\hline
   RM 			& 41\% 	& 43\% 		& 48\%		& 54\%		& 35\%		& 48\%		& 43\%	& -				\\ 	\hline
 \end{tabular}
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board c 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board c 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& Exp3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 37\% 		& 81\%		& 89\%		& 84\%		& 96\%		& 71\%	& 72\%				\\ 	\hline
   UCB1T 		& 63\% 	& - 		& 79\%		& 71\%		& 88\%		& 89\%		& 73\%	& 70\%				\\ 	\hline
   DUCT(max) 		& 19\% 	& 21\% 		& -		& 58\%		& 41\%		& 52\%		& 69\%	& 61\%				\\ 	\hline
   DUCT(mix) 		& 11\% 	& 29\% 		& 42\%		& -		& 39\%		& 49\%		& 51\%	& 51\%				\\ 	\hline
   DUCB1T(max)	 	& 16\% 	& 12\% 		& 59\%		& 61\%		& -		& 59\%		& 68\%	& 64\%				\\ 	\hline
   DUCB1T(mix)	 	& 4\%  	& 11\% 		& 48\%		& 51\%		& 41\%		& -		& 50\%	& 58\%				\\ 	\hline
-  EXP3 			& 29\% 	& 27\% 		& 31\%		& 49\%		& 32\%		& 50\%		& -	& 49\%				\\ 	\hline
+  Exp3 			& 29\% 	& 27\% 		& 31\%		& 49\%		& 32\%		& 50\%		& -	& 49\%				\\ 	\hline
   RM 			& 28\% 	& 30\% 		& 39\%		& 49\%		& 36\%		& 42\%		& 51\%	& -				\\ 	\hline
 \end{tabular}
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board d 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board d 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& Exp3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 52\%		& 48\%		& 51\%		& 50\%		& 64\%		& 67\%	& 65\%				\\ 	\hline
   UCB1T 		& 48\% 	& - 		& 45\%		& 57\%		& 53\%		& 67\%		& 59\%	& 67\%				\\ 	\hline
   DUCT(max) 		& 52\% 	& 55\% 		& -		& 60\%		& 49\%		& 61\%		& 59\%	& 62\%				\\ 	\hline
   DUCT(mix) 		& 49\% 	& 43\% 		& 40\%		& -		& 41\%		& 55\%		& 50\%	& 49\%				\\ 	\hline
   DUCB1T(max)	 	& 50\% 	& 47\% 		& 51\%		& 59\%		& -		& 57\%		& 64\%	& 68\%				\\ 	\hline
   DUCB1T(mix)	 	& 36\% 	& 33\% 		& 39\%		& 45\%		& 43\%		& -		& 51\%	& 49\%				\\ 	\hline
-  EXP3 			& 33\% 	& 41\% 		& 41\%		& 50\%		& 36\%		& 49\%		& -	& 52\%				\\ 	\hline
+  Exp3 			& 33\% 	& 41\% 		& 41\%		& 50\%		& 36\%		& 49\%		& -	& 52\%				\\ 	\hline
   RM 			& 35\% 	& 23\% 		& 38\%		& 51\%		& 32\%		& 51\%		& 48\%	& -				\\ 	\hline
 \end{tabular}
 %\caption{Results of the different selection strategies playing on Board a,b,c and d.}
@@ -434,14 +434,14 @@ Each percentages refers to the win rate of the row player. \label{table:round_ro
 \centering
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Total 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
+  Total 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& Exp3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 49\%		& 57\%		& 63\%		& 60\%		& 72\%		& 66\%	& 64\%				\\ 	\hline
   UCB1T 		& 51\% 	& - 		& 57\%		& 61\%		& 61\%		& 71\%		& 65\%	& 63\%				\\ 	\hline
   DUCT(max) 		& 43\% 	& 43\% 		& -		& 60\%		& 46\%		& 58\%		& 61\%	& 60\%				\\ 	\hline
   DUCT(mix) 		& 37\% 	& 39\% 		& 40\%		& -		& 40\%		& 51\%		& 51\%	& 49\%				\\ 	\hline
   DUCB1T(max)	 	& 40\% 	& 39\% 		& 54\%		& 60\%		& -		& 61\%		& 65\%	& 67\%				\\ 	\hline
   DUCB1T(mix)	 	& 18\% 	& 19\% 		& 42\%		& 49\%		& 39\%		& -		& 53\%	& 52\%				\\ 	\hline
-  EXP3 			& 34\%	& 35\% 		& 39\%		& 49\%		& 35\%		& 47\%		& -	& 52\%				\\ 	\hline
+  Exp3 			& 34\%	& 35\% 		& 39\%		& 49\%		& 35\%		& 47\%		& -	& 52\%				\\ 	\hline
   RM		 	& 36\% 	& 37\%		& 40\%		& 51\%		& 33\%		& 48\%		& 48\%	& -				\\ 	\hline
 \end{tabular}
 \caption{Average results of the different selection strategies playing against each other on the large board.}
@@ -453,7 +453,7 @@ Each percentages refers to the win rate of the row player. \label{table:round_ro
 \centering
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|c|}
 									\hline
-	6$\times$6 Board	& UCB1T 	& UCT		& DUCT(max)	& DUCB1T(max)	& DUCT(mix)	& DUCB1T(mix)	& RM	& EXP3	& Total			\\ \hline
+	6$\times$6 Board	& UCB1T 	& UCT		& DUCT(max)	& DUCB1T(max)	& DUCT(mix)	& DUCB1T(mix)	& RM	& Exp3	& Total			\\ \hline
 	UCB1T							& -				& 52\%	& 59\%			& 62\%				& 59\%			& 62\%				& 57\%& 61\%	& 59 $\pm$ 2.57 \%		\\ \hline
 	UCT								& 48\%		& -			& 55\%			& 61\%				& 57\%			& 56\%				& 60\%& 59\%	& 57 $\pm$ 2.56 \%		\\ \hline
 	DUCT(max)					& 41\%		& 45\%	& -					& 48\%				& 56\%			& 56\%				& 54\%& 60\%	& 52 $\pm$ 2.62 \%		\\ \hline
@@ -461,7 +461,7 @@ Each percentages refers to the win rate of the row player. \label{table:round_ro
 	DUCT(mix)					& 41\%		& 43\%	& 44\%			& 44\%				& -					& 53\%				& 50\%& 49\%	& 47 $\pm$ 2.61 \%		\\ \hline
 	DUCB1T(mix)				& 38\%		& 44\%	& 44\%			& 43\%				& 43\%			& -						& 51\%& 54\%	& 46 $\pm$ 2.61 \%		\\ \hline
 	RM								& 43\%		& 40\%	& 46\%			& 37\%				& 50\%			& 46\%				& -		& 46\%	& 46 $\pm$ 2.61 \%		\\ \hline
-	EXP3							& 39\%		& 41\%	& 40\%			& 39\%				& 51\%			& 41\%				& 54\%& -			& 44 $\pm$ 2.60 \%		\\ \hline
+	Exp3							& 39\%		& 41\%	& 40\%			& 39\%				& 51\%			& 41\%				& 54\%& -			& 44 $\pm$ 2.60 \%		\\ \hline
 \end{tabular}
 \caption{Results of the different selection strategies playing against each other on a $6\times6$ board. $\pm$ refers to 95\% confidence intervals.}
 %\caption*{UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching}
@@ -472,14 +472,14 @@ Each percentages refers to the win rate of the row player. \label{table:round_ro
 %\subsection{Parameter Tuning}
 %\label{subsec:parameter_tuning}
 
-Before running performance experiments, some parameters ($C$ and $T$ in UCT, $\gamma$ in EXP3 and Regret Matching) are tuned. 
+Before running performance experiments, some parameters ($C$ and $T$ in UCT, $\gamma$ in Exp3 and Regret Matching) are tuned. 
 %This is done to assure that the different strategies perform optimally. 
 As reference constants, values are used which were taken from different sources~\cite{teuling_tron,cig_paper}. Parameter $C$, which is used in Equation~\ref{uct}) was tuned by letting a UCT player playing games against a MCTS player with a random selection and a random play-out strategy. 
 After 10 games the value of the parameter $C$ was slightly increased or decreased, depending on how strong the UCT player played. 
 Starting with the reference constant, 120 games were played in order to find a value for $C$ which did not change significantly.
 Parameter $T$ and $\gamma \in [0,1]$ were tuned similarly.
 %The parameter $T$ used in UCT and UCB1-Tuned, which is the threshold before either UCT or UCB1-Tuned is applied as a selection strategy was tuned in the same way as the parameter $C$. This parameter tuning showed the same result as shown by Teuling~\cite{teuling_tron}, namely that the parameter $T$ does not influence the performance of UCT and UCB1-Tuned.\\
-%The parameter $\gamma \in \[$ of EXP3 and Regret Matching was also tuned in the same way as the parameter $C$ with the only difference being that $\gamma$ must be in the interval of $[0,1]$.\\
+%The parameter $\gamma \in \[$ of Exp3 and Regret Matching was also tuned in the same way as the parameter $C$ with the only difference being that $\gamma$ must be in the interval of $[0,1]$.\\
 The tuned values can be seen in Figure~\ref{fig:boards_parms}.
 %The reference constants from previous work were $(C, T, \gamma(Exp3), \gamma(
 
@@ -498,7 +498,7 @@ All the other strategies, which include the mix versions of the decoupled UCT an
 Exp3 and Regret Matching, do not perform well overall ($<50\%$).
 Furthermore, the largest performance gap between sequential and simultaneous MCTS is in Board c. 
 
-Generally the sequential strategies perform better than the decoupled strategies, which is especially visible on Board c (see Table~\ref{table:round_robin}), where the UCT and UCB1-Tuned only lost 4\%-19\% of its games against all DUCT strategies and only 28\%-29\% against EXP3 and Regret Matching, respectively. 
+Generally the sequential strategies perform better than the decoupled strategies, which is especially visible on Board c (see Table~\ref{table:round_robin}), where the UCT and UCB1-Tuned only lost 4\%-19\% of its games against all DUCT strategies and only 28\%-29\% against Exp3 and Regret Matching, respectively. 
 Additionally, the deterministic selection strategies perform better than stochastic selection strategies on $16\times16$ boards, where all deterministic strategies win $>50\%$ and all stochastic win $<50\%$ of their matches. 
 
 %sequential MCTS out performs the decoupled versions of MCTS.
@@ -519,8 +519,8 @@ For example, the in Figure~\ref{fig:example_avgs} both players have two possible
 %On the other hand, the tuning of $T$ showed little impact on overall performance. 
 %of the UCT and UCB1-Tuned selection strategy was tuned. After some experiments, the tuning was stopped, because it did not seem to have much impact on the result of the selection strategies. 
 %Therefore, 30 is still used for the parameter $T$. 
-%The parameter $\gamma$ from the EXP3 and Regret Matching selection strategy was tuned to 0.39 and 0.31, respectively, to increase performance of those strategies.\\
-%Already the selection strategies, which are deterministic, but only use a stochastic process to determine their final move, such as DUCT(Mix) and DUCB1-Tuned(Mix), perform way weaker than their counterparts DUCT(Max) and DUCB1-Tuned(Max).\\
+%The parameter $\gamma$ from the Exp3 and Regret Matching selection strategy was tuned to 0.39 and 0.31, respectively, to increase performance of those strategies.\\
+%Already the selection strategies, which are deterministic, but only use a stochastic process to determine their final move, such as DUCT(mix) and DUCB1-Tuned(mix), perform way weaker than their counterparts DUCT(max) and DUCB1-Tuned(max).\\
 
 
 \begin{figure}[h]
@@ -537,7 +537,7 @@ For example, the in Figure~\ref{fig:example_avgs} both players have two possible
 	DUCT(max)		        & 56\%		& 53\%		& 37\%		& 57\%		& 51 $\pm$ 1.31\%		\\ \hline
 	DUCT(mix)		        & 44\%		& 46\%		& 39\%		& 47\%		& 45 $\pm$ 1.30\%		\\ \hline
 	DUCB1-Tuned(mix)	  & 43\%		& 44\%		& 38\%		& 42\%		& 42 $\pm$ 1.29\%		\\ \hline
-	EXP3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42 $\pm$ 1.29\%		\\ \hline
+	Exp3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42 $\pm$ 1.29\%		\\ \hline
 	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41 $\pm$ 1.28\%		\\ \hline
 \end{tabular}
 \end{subfigure}
