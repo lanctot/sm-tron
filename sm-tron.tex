@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage[table]{xcolor}
 \usepackage{caption}
+\usepackage{subcaption}
 
 \newcommand{\eg}{{\it e.g.,}~}
 \newcommand{\ie}{{\it i.e.,}~}
@@ -70,9 +71,9 @@
 %In the field of Artificial Intelligence (AI), much research in games has been done already. 
 An important research topic in Artificial Intelligence (AI) is the development of intelligent agents. 
 A classic benchmark is the ability to play games better than human experts. 
-These games usually include classic board games, such as Chess~\cite{deep_blue}, Checkers~\cite{schaeffer_2009} and Go~\cite{computer_go} because they are simple to learn yet hard to master.
+Classic examples include Chess, Checkers and Go, each of which are simple to learn yet hard to master.
 %In games where a player always has a set of moves to choose from, like the games mentioned above, a good idea is to build a search tree, which evaluates the moves a player can take and eventually chooses one move. 
-In classical game tree search, game-specific knowledge is used to determine the strength of each position using a statuc evaluation function~\cite{ai_russel_norvig}. 
+In classical game tree search, game-specific knowledge is used to determine the strength of each position using a static evaluation function. %~\cite{ai_russel_norvig}. 
 If the evaluation function is too complex or a large search tree is required, then either the search has to be increased an alternative approach can be chosen. 
 
 Monte Carlo Tree Search (MCTS)~\cite{chaslot_phd,coulom,kocsis} builds up a search tree without requiring an evaluation function. Instead, it builds the search tree by repeating four phases, as explained below. MCTS was initially applied to the game of Go~\cite{coulom} but has since been applied to many different games and settings~\cite{mctssurvey}. This paper focuses on sampling policies and update rules in MCTS applies to two-player turn-taking simultaneous move games, such as Tron. Some algorithms are investigated in this paper, including sequential UCT~\cite{kocsis} are: UCB1-Tuned, Decoupled UCT, Decoupled UCB1-Tuned EXP3 and Regret Matching.
@@ -282,7 +283,7 @@ As in DUCT(mix), the final move is sampled from the normalized visit count distr
 
 \subsection{Regret Matching}
 \label{subsec:rm}
-Regret Matching, as EXP3 and DUCT, selects always joint actions. Opposed to the other strategies, Regret Matching stores a matrix $M$ with the estimated mean of the rewards (See Equation~\ref{rm_equations}, where $\bar{X}_{m,n}$ is the mean of the rewards for player 1 when the joint action $(a_{1}=m,a_{2}=n)$ was selected).
+Regret Matching (RM)~\cite{Hart00}, as Exp3 and DUCT, selects always joint actions. Opposed to the other strategies, Regret Matching stores a matrix $M$ with the estimated mean of the rewards (See Equation~\ref{rm_equations}, where $\bar{X}_{m,n}$ is the mean of the rewards for player 1 when the joint action $(a_{1}=m,a_{2}=n)$ was selected).
 
 \begin{equation}
 \label{rm_equations}
@@ -331,26 +332,33 @@ The final move is selected as in DUCT(Mix) and EXP3 by using a mixed strategy by
 
 \section{Experiments}
 \label{sec:experiments}
-In this section the different selection strategies, which were proposed in Section~\ref{sec:selection_strategies} are tested. Because the framework, which was implemented by Teuling~\cite{teuling_tron}, used for this experiments is based on sequential UCT, DUCT, EXP3 and Regret Matching were not optimally implemented. Therefore it would be an unfair comparison, if all agents would have the same thinking time. In order to make it a fair comparison, each agent is allowed to simulate a fixed number of simulations. In the case of this experiment the number is set to 100,000. The experiments are run on four different boards (Three boards with obstacles on it (See Fig.~\ref{fig:ex_boards}) and an empty board (d)), all with dimensions of 16$\times$16. On each board 200 games are played and, even though all the boards are symmetric, the starting positions are switched after half of the games, to assure that none of the agents are benefiting from starting in a certain position. The play-out strategy, which is used in all experiments is the random strategy with play-out cut-off as an enhancement. Also, the expansion strategy uses the predictive expansion strategy.\\
-Some parameters are tuned in Subsection~\ref{subsec:parameter_tuning} and the several selection strategies introduced in this paper, are tested against each other in a round-robin tournament in Subsection~\ref{subsec:round_robin}. In addition another round-robin tournament is conducted on a smaller 6$\times$6 board to see how the results differ from the ones conducted in the round-robin tournament on the large boards.
 
-\begin{figure}[t]
-\begin{center}
-\includegraphics[width=8.5cm]{images/boards.png}
-\caption{Four different boards are used for the experiments in the round-robin tournament. a,b and c, as well as the empty board, d, of the same size.\label{fig:ex_boards}}
-\end{center}
-\end{figure}
+In this section the different selection and strategies are evaluated. 
+%Because the framework, which was implemented by Teuling~\cite{teuling_tron}, used for this experiments is based on sequential UCT, DUCT, EXP3 and Regret Matching were not optimally implemented. 
+%Therefore it would be an unfair comparison, if all agents would have the same thinking time. 
+In order to make it a fair comparison using a common framework, each agent is allowed to simulate a fixed number of simulations (100,000). 
+%In the case of this experiment the number is set to 100,000. 
+The experiments are run on four different boards, three with obstacles on it (see Figure~\ref{fig:boards_parms}) and an empty board (d)), all with dimensions of $16 \times 16$. 
+On each board 200 games are played with swapped starting positions. 
+%to assure that none of the agents are benefiting from starting in a certain position. 
+The play-out strategy, which is used in all experiments, is the random strategy with play-out cut-offs enhancement mentioned in Section~\ref{sec:tron_specific_mcts}. The expansion strategy uses the predictive expansion strategy.
 
-\subsection{Parameter Tuning}
-\label{subsec:parameter_tuning}
-In the beginning, some parameters ($C$ and $T$ in UCT and $\gamma$ in EXP3 and Regret Matching) are tuned. This is done, to assure that the different strategies perform optimally. As reference constants, values are used, which were taken from different sources~\cite{teuling_tron,cig_paper}. Parameter $C$, which is used in UCB1 (See Equation~\ref{uct}) was tuned, by letting a UCT player playing games against a MCTS player with a random selection and a random play-out strategy. After 10 games the value of the parameter $C$ was slightly increased or decreased, depending on how strong the UCT player played. Starting with the reference constant, 120 games were played in order to find a value for $C$ which did not change significantly anymore.\\
-The parameter $T$ used in UCT and UCB1-Tuned, which is the threshold before either UCT or UCB1-Tuned is applied as a selection strategy was tuned in the same way as the parameter $C$. This parameter tuning showed the same result as shown by Teuling~\cite{teuling_tron}, namely that the parameter $T$ does not influence the performance of UCT and UCB1-Tuned.\\
-The parameter $\gamma$ of EXP3 and Regret Matching was also tuned in the same way as the parameter $C$ with the only difference, that $\gamma$ must be in the interval of $[0,1]$.\\
-All the tuned values can be seen in Table~\ref{table:parameter_tuning}.
+%Some parameters are tuned in Subsection~\ref{subsec:parameter_tuning} and the several selection strategies introduced in this paper, are tested against each other in a round-robin tournament in Subsection~\ref{subsec:round_robin}. In addition another round-robin tournament is conducted on a smaller $6 \times 6$ board to see how the results differ from the ones conducted in the round-robin tournament on the large boards.
 
-\begin{table}[b]\footnotesize
-\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the EXP3 algorithm}
+\begin{figure}
+\centering 
+
+\hspace{-2.7cm}\begin{subfigure}[c]{0.5\textwidth}
 \centering
+\includegraphics[width=\textwidth]{images/boards.png} 
+%\caption{Four different boards are used for the experiments in the round-robin tournament. a,b and c, as well as the empty board, d, of the same size.\label{fig:ex_boards}}
+\end{subfigure}
+~
+\begin{subfigure}[c]{0.3\textwidth}
+%\begin{table}[b]
+\centering
+\footnotesize
+%\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the EXP3 algorithm}
 \begin{tabular}{|c||c|c|}
 							\hline
 Parameter			& Reference constant		& Tuned value	\\ \hline\hline
@@ -358,75 +366,70 @@ $C$				& 10~\cite{teuling_tron}	& 13.2		\\ \hline
 $T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
 $\gamma$(EXP3)			& 0.36~\cite{cig_paper}		& 0.39		\\ \hline
 $\gamma$(Regret Matching)	& 0.36				& 0.31		\\ \hline
-
 \end{tabular}
-\label{table:parameter_tuning}
-\end{table}
+%\label{table:parameter_tuning}
+%\end{table}
+\end{subfigure}
+\caption{Left: Four different boards are used for the experiments in the round-robin tournament. Right: tuned parameter constants. \label{fig:boards_parms}}
+\end{figure}
 
-\subsection{Round-Robin Tournament}
-\label{subsec:round_robin}
-In this subsection, several players using different selection strategies are tested. In Table~\ref{table:round_robin} the results of the games on all four maps are seen and Table~\ref{table:round_robin_total} shows the average performance of all players.
-
-\begin{table*}\scriptsize
-\caption{Results of the different selection strategies playing on Board a,b,c and d.}
+\begin{table}[t]\scriptsize
 \centering
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board a 		& UCT 	& UCB1T		& DUCT(Max)	& DUCT(Mix)	& DUCB1T(Max)	& DUCB1T(Mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board a 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 61\%		& 51\% 		& 54\%		& 53\%		& 67\%		& 65\%	& 62\%				\\ 	\hline
   UCB1T 		& 39\% 	& - 		& 53\%		& 61\%		& 52\%		& 65\%		& 66\%	& 61\%				\\ 	\hline
-  DUCT(Max) 		& 49\% 	& 47\%		& -		& 67\%		& 43\%		& 62\%		& 63\%	& 67\%				\\ 	\hline
-  DUCT(Mix) 		& 46\% 	& 39\% 		& 33\%		& -		& 37\%		& 48\%		& 53\%	& 51\%				\\ 	\hline
-  DUCB1T(Max)	 	& 47\% 	& 48\% 		& 57\%		& 63\%		& -		& 61\%		& 64\%	& 69\%				\\ 	\hline
-  DUCB1T(Mix)	 	& 33\% 	& 35\% 		& 38\%		& 52\%		& 39\%		& -		& 54\%	& 51\%				\\ 	\hline
+  DUCT(max) 		& 49\% 	& 47\%		& -		& 67\%		& 43\%		& 62\%		& 63\%	& 67\%				\\ 	\hline
+  DUCT(mix) 		& 46\% 	& 39\% 		& 33\%		& -		& 37\%		& 48\%		& 53\%	& 51\%				\\ 	\hline
+  DUCB1T(max)	 	& 47\% 	& 48\% 		& 57\%		& 63\%		& -		& 61\%		& 64\%	& 69\%				\\ 	\hline
+  DUCB1T(mix)	 	& 33\% 	& 35\% 		& 38\%		& 52\%		& 39\%		& -		& 54\%	& 51\%				\\ 	\hline
   EXP3 			& 35\% 	& 34\% 		& 37\%		& 47\%		& 36\%		& 46\%		& -	& 51\%				\\ 	\hline
   RM		 	& 38\%	& 39\% 		& 33\%		& 49\%		& 31\%		& 49\%		& 49\%	& -				\\ 	\hline
 \end{tabular}
-
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board b 		& UCT 	& UCB1T		& DUCT(Max)	& DUCT(Mix)	& DUCB1T(Max)	& DUCB1T(Mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board b 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 47\%		& 49\%		& 57\%		& 51\%		& 61\%		& 61\%	& 59\%				\\ 	\hline
   UCB1T 		& 53\% 	& - 		& 51\%		& 54\%		& 49\%		& 65\%		& 64\%	& 57\%				\\ 	\hline
-  DUCT(Max) 		& 51\% 	& 49\% 		& -		& 54\%		& 51\%		& 58\%		& 54\%	& 52\%				\\ 	\hline
-  DUCT(Mix) 		& 43\%	& 46\% 		& 46\%		& -		& 41\%		& 52\%		& 49\%	& 46\%				\\ 	\hline
-  DUCB1T(Max)	 	& 49\% 	& 51\% 		& 49\%		& 59\%		& -		& 68\%		& 62\%	& 65\%				\\ 	\hline
-  DUCB1T(Mix)	 	& 39\% 	& 35\% 		& 42\%		& 48\%		& 32\%		& -		& 57\%	& 52\%				\\ 	\hline
+  DUCT(max) 		& 51\% 	& 49\% 		& -		& 54\%		& 51\%		& 58\%		& 54\%	& 52\%				\\ 	\hline
+  DUCT(mix) 		& 43\%	& 46\% 		& 46\%		& -		& 41\%		& 52\%		& 49\%	& 46\%				\\ 	\hline
+  DUCB1T(max)	 	& 49\% 	& 51\% 		& 49\%		& 59\%		& -		& 68\%		& 62\%	& 65\%				\\ 	\hline
+  DUCB1T(mix)	 	& 39\% 	& 35\% 		& 42\%		& 48\%		& 32\%		& -		& 57\%	& 52\%				\\ 	\hline
   EXP3 			& 39\% 	& 36\% 		& 46\%		& 51\%		& 38\%		& 43\%		& -	& 57\%				\\ 	\hline
   RM 			& 41\% 	& 43\% 		& 48\%		& 54\%		& 35\%		& 48\%		& 43\%	& -				\\ 	\hline
 \end{tabular}
-
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board c 		& UCT 	& UCB1T		& DUCT(Max)	& DUCT(Mix)	& DUCB1T(Max)	& DUCB1T(Mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board c 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 37\% 		& 81\%		& 89\%		& 84\%		& 96\%		& 71\%	& 72\%				\\ 	\hline
   UCB1T 		& 63\% 	& - 		& 79\%		& 71\%		& 88\%		& 89\%		& 73\%	& 70\%				\\ 	\hline
-  DUCT(Max) 		& 19\% 	& 21\% 		& -		& 58\%		& 41\%		& 52\%		& 69\%	& 61\%				\\ 	\hline
-  DUCT(Mix) 		& 11\% 	& 29\% 		& 42\%		& -		& 39\%		& 49\%		& 51\%	& 51\%				\\ 	\hline
-  DUCB1T(Max)	 	& 16\% 	& 12\% 		& 59\%		& 61\%		& -		& 59\%		& 68\%	& 64\%				\\ 	\hline
-  DUCB1T(Mix)	 	& 4\%  	& 11\% 		& 48\%		& 51\%		& 41\%		& -		& 50\%	& 58\%				\\ 	\hline
+  DUCT(max) 		& 19\% 	& 21\% 		& -		& 58\%		& 41\%		& 52\%		& 69\%	& 61\%				\\ 	\hline
+  DUCT(mix) 		& 11\% 	& 29\% 		& 42\%		& -		& 39\%		& 49\%		& 51\%	& 51\%				\\ 	\hline
+  DUCB1T(max)	 	& 16\% 	& 12\% 		& 59\%		& 61\%		& -		& 59\%		& 68\%	& 64\%				\\ 	\hline
+  DUCB1T(mix)	 	& 4\%  	& 11\% 		& 48\%		& 51\%		& 41\%		& -		& 50\%	& 58\%				\\ 	\hline
   EXP3 			& 29\% 	& 27\% 		& 31\%		& 49\%		& 32\%		& 50\%		& -	& 49\%				\\ 	\hline
   RM 			& 28\% 	& 30\% 		& 39\%		& 49\%		& 36\%		& 42\%		& 51\%	& -				\\ 	\hline
 \end{tabular}
-
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
-  Board d 		& UCT 	& UCB1T		& DUCT(Max)	& DUCT(Mix)	& DUCB1T(Max)	& DUCB1T(Mix)	& EXP3	& RM				\\ 	\hline\hline
+  Board d 		& UCT 	& UCB1T		& DUCT(max)	& DUCT(mix)	& DUCB1T(max)	& DUCB1T(mix)	& EXP3	& RM				\\ 	\hline\hline
   UCT 			&  -	& 52\%		& 48\%		& 51\%		& 50\%		& 64\%		& 67\%	& 65\%				\\ 	\hline
   UCB1T 		& 48\% 	& - 		& 45\%		& 57\%		& 53\%		& 67\%		& 59\%	& 67\%				\\ 	\hline
-  DUCT(Max) 		& 52\% 	& 55\% 		& -		& 60\%		& 49\%		& 61\%		& 59\%	& 62\%				\\ 	\hline
-  DUCT(Mix) 		& 49\% 	& 43\% 		& 40\%		& -		& 41\%		& 55\%		& 50\%	& 49\%				\\ 	\hline
-  DUCB1T(Max)	 	& 50\% 	& 47\% 		& 51\%		& 59\%		& -		& 57\%		& 64\%	& 68\%				\\ 	\hline
-  DUCB1T(Mix)	 	& 36\% 	& 33\% 		& 39\%		& 45\%		& 43\%		& -		& 51\%	& 49\%				\\ 	\hline
+  DUCT(max) 		& 52\% 	& 55\% 		& -		& 60\%		& 49\%		& 61\%		& 59\%	& 62\%				\\ 	\hline
+  DUCT(mix) 		& 49\% 	& 43\% 		& 40\%		& -		& 41\%		& 55\%		& 50\%	& 49\%				\\ 	\hline
+  DUCB1T(max)	 	& 50\% 	& 47\% 		& 51\%		& 59\%		& -		& 57\%		& 64\%	& 68\%				\\ 	\hline
+  DUCB1T(mix)	 	& 36\% 	& 33\% 		& 39\%		& 45\%		& 43\%		& -		& 51\%	& 49\%				\\ 	\hline
   EXP3 			& 33\% 	& 41\% 		& 41\%		& 50\%		& 36\%		& 49\%		& -	& 52\%				\\ 	\hline
   RM 			& 35\% 	& 23\% 		& 38\%		& 51\%		& 32\%		& 51\%		& 48\%	& -				\\ 	\hline
 \end{tabular}
-\caption*{UCB1T=UCB1-Tuned, DUCB1T(Max)=DUCB1-Tuned(Max), DUCB1T(Mix)=DUCB1-Tuned(Mix), RM=Regret Matching}
-\label{table:round_robin}
-\end{table*}
+%\caption{Results of the different selection strategies playing on Board a,b,c and d.}
+\caption{Results of the different selection strategies playing on Board a, b, c and d. 
+Each percentages refers to the win rate of the row player. \label{table:round_robin}}
+%UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching;
+\end{table}
 
-\begin{table*}\scriptsize
-\caption{Average results of the different selection strategies playing against each other.}
+\begin{table}[h!]\scriptsize
 \centering
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|}
 									\hline
@@ -440,36 +443,92 @@ In this subsection, several players using different selection strategies are tes
   EXP3 			& 34\%	& 35\% 		& 39\%		& 49\%		& 35\%		& 47\%		& -	& 52\%				\\ 	\hline
   RM		 	& 36\% 	& 37\%		& 40\%		& 51\%		& 33\%		& 48\%		& 48\%	& -				\\ 	\hline
 \end{tabular}
-\caption*{UCB1T=UCB1-Tuned, DUCB1T(Max)=DUCB1-Tuned(Max), DUCB1T(Mix)=DUCB1-Tuned(Mix), RM=Regret Matching}
+\caption{Average results of the different selection strategies playing against each other on the large board.}
+%Here, UCB1T=UCB1-Tuned, DUCB1T(Max)=DUCB1-Tuned(Max), DUCB1T(Mix)=DUCB1-Tuned(Mix), RM=Regret Matching}
 \label{table:round_robin_total}
-\end{table*}
+\end{table}
 
-From Table~\ref{table:round_robin_results} we can see, that the sequential UCT and UCB1-Tuned selection strategies perform best. The Max versions of the decoupled UCT and UCB1-Tuned strategy still performs reasonably well ($>50\%$). All the other strategies, which include the Mix versions of the decoupled UCT and UCB1-Tuned, as well as EXP3 and Regret Matching, perform not that well ($<50\%$).\\
-Furthermore it stands out that on Board c, the sequential MCTS out performs  the decoupled versions of MCTS.
+\begin{table}[h!]\scriptsize
+\centering
+\begin{tabular}{|c||c|c|c|c|c|c|c|c|c|}
+									\hline
+	6$\times$6 Board	& UCB1T 	& UCT		& DUCT(Max)	& DUCB1T(Max)	& DUCT(Mix)	& DUCB1T(Mix)	& RM	& EXP3	& Total			\\ \hline
+	UCB1T							& -				& 52\%	& 59\%			& 62\%				& 59\%			& 62\%				& 57\%& 61\%	& 59 $\pm$ 2.57 \%		\\ \hline
+	UCT								& 48\%		& -			& 55\%			& 61\%				& 57\%			& 56\%				& 60\%& 59\%	& 57 $\pm$ 2.56 \%		\\ \hline
+	DUCT(Max)					& 41\%		& 45\%	& -					& 48\%				& 56\%			& 56\%				& 54\%& 60\%	& 52 $\pm$ 2.62 \%		\\ \hline
+	DUCB1T(Max)				& 38\%		& 39\%	& 52\%			& -						& 56\%			& 57\%				& 63\%& 61\%	& 52 $\pm$ 2.62 \%		\\ \hline
+	DUCT(Mix)					& 41\%		& 43\%	& 44\%			& 44\%				& -					& 53\%				& 50\%& 49\%	& 47 $\pm$ 2.61 \%		\\ \hline
+	DUCB1T(Mix)				& 38\%		& 44\%	& 44\%			& 43\%				& 43\%			& -						& 51\%& 54\%	& 46 $\pm$ 2.61 \%		\\ \hline
+	RM								& 43\%		& 40\%	& 46\%			& 37\%				& 50\%			& 46\%				& -		& 46\%	& 46 $\pm$ 2.61 \%		\\ \hline
+	EXP3							& 39\%		& 41\%	& 40\%			& 39\%				& 51\%			& 41\%				& 54\%& -			& 44 $\pm$ 2.60 \%		\\ \hline
+\end{tabular}
+\caption{Results of the different selection strategies playing against each other on a $6\times6$ board. $\pm$ refers to 95\% confidence intervals.}
+%\caption*{UCB1T=UCB1-Tuned, DUCB1T(Max)=DUCB1-Tuned(Max), DUCB1T(Mix)=DUCB1-Tuned(Mix), RM=Regret Matching}
+\label{table:rr_small}
+\end{table}
 
-The same selection strategies were tested again against each other in another round-robin tournament, which will be played on a 6$\times$6 board. From the results in Table~\ref{table:rr_small} can be seen, that deterministic selection strategies are still doing better that stochastic ones. But, stochastic strategies perform better on the 6$\times$6 board than on the larger 16$\times$16 board.
 
-\subsection{Discussion}
+%\subsection{Parameter Tuning}
+%\label{subsec:parameter_tuning}
+
+Before running performance experiments, some parameters ($C$ and $T$ in UCT, $\gamma$ in EXP3 and Regret Matching) are tuned. 
+%This is done to assure that the different strategies perform optimally. 
+As reference constants, values are used which were taken from different sources~\cite{teuling_tron,cig_paper}. Parameter $C$, which is used in Equation~\ref{uct}) was tuned by letting a UCT player playing games against a MCTS player with a random selection and a random play-out strategy. 
+After 10 games the value of the parameter $C$ was slightly increased or decreased, depending on how strong the UCT player played. 
+Starting with the reference constant, 120 games were played in order to find a value for $C$ which did not change significantly.
+Parameter $T$ and $\gamma \in [0,1]$ were tuned similarly.
+%The parameter $T$ used in UCT and UCB1-Tuned, which is the threshold before either UCT or UCB1-Tuned is applied as a selection strategy was tuned in the same way as the parameter $C$. This parameter tuning showed the same result as shown by Teuling~\cite{teuling_tron}, namely that the parameter $T$ does not influence the performance of UCT and UCB1-Tuned.\\
+%The parameter $\gamma \in \[$ of EXP3 and Regret Matching was also tuned in the same way as the parameter $C$ with the only difference being that $\gamma$ must be in the interval of $[0,1]$.\\
+The tuned values can be seen in Figure~\ref{fig:boards_parms}.
+%The reference constants from previous work were $(C, T, \gamma(Exp3), \gamma(
+
+\subsection{Round-Robin Tournaments}
+\label{subsec:round_robin}
+In this subsection, the performance of several players using different selection and update strategies are compared. 
+This is done by playing matchups (of 400 games) of each player type against every other player type. 
+Table~\ref{table:round_robin} presents the results of the games on all four maps and Table~\ref{table:round_robin_total} presents the average performance of all players.
+
+
+Table~\ref{table:round_robin_results} presents the average performance of each agent over all maps. 
+From this, we see that sequential UCT and UCB1-Tuned selection strategies perform best overall. 
+The max versions of the decoupled UCT and UCB1-Tuned strategy still perform reasonably well ($>50\%$). 
+All the other strategies, which include the mix versions of the decoupled UCT and UCB1-Tuned, as well as 
+Exp3 and Regret Matching, do not perform well overall ($<50\%$).
+Furthermore, the largest performance gap between sequential and simultaneous MCTS is in Board c. 
+%sequential MCTS out performs the decoupled versions of MCTS.
+
+The same selection strategies were tested again against each other in another round-robin tournament on a smaller ($6 \times 6$) board. 
+From the results in Table~\ref{table:rr_small}, we see that deterministic selection strategies are still doing better that stochastic 
+ones, but nonetheless perform better on the smaller board than on the larger board.
+
+\subsubsection{Discussion}
 \label{subsec:discussion}
 
-The experiments revealed that the parameter $C$ of the UCT selection strategy was optimal at 13.2. Usually, the parameter $C$ is fairly low, but in Tron, there are only 3 possible moves, therefore it is beneficial to know where all three moves would lead us. A high $C$ parameter ensures that the exploration of all nodes is given, which explains the result of the high $C$ parameter.\\
-The parameter $T$ of the UCT and UCB1-Tuned selection strategy was tuned. After some experiments, the tuning was stopped, because it did not seem to have much impact on the result of the selection strategies. Therefore, 30 is still used for the parameter $T$. The parameter $\gamma$ from the EXP3 and Regret Matching selection strategy was tuned to 0.39 and 0.31, respectively, to increase performance of those strategies.\\
-The round-robin tournament, in which every selection strategy played against each other, showed that the sequential UCB1-Tuned algorithm wins on average 63\% of its games and is therefore the winner of the tournament. Further it may be concluded, that the sequential strategies perform better than the decoupled strategies, which is especially visible on Board c (See Table~\ref{table:round_robin}), where the UCT and UCB1-Tuned only lost 4\%-19\% of its games against all DUCT strategies and only 28\%-29\% against EXP3 and Regret Matching, respectively. Additionally, it can be concluded that deterministic selection strategies perform superior than stochastic selection strategies on 16$\times$16 boards (All deterministic strategies win $>50\%$ and all stochastic win $<50\%$ of their matches). Already the selection strategies, which are deterministic, but only use a stochastic process to determine their final move, such as DUCT(Mix) and DUCB1-Tuned(Mix), perform way weaker than their counterparts DUCT(Max) and DUCB1-Tuned(Max).\\
-Furthermore, the round-robin tournament on the smaller 6$\times$6 board showed, that if a smaller board is used, the performance of the deterministic strategies decrease and the performance of the stochastic strategies increase. This indicates, that as soon as both players come closer together, using a stochastic strategy might be more suitable than a deterministic one. This phenomenon is illustrated in Figure~\ref{fig:stochastic}, where both players have two possible moves. If both players choose $a^{p}_{1}$ (``Left''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Right''), Player 1 also wins. Therefore it might be beneficial for Player 2 to play with a mixed strategy, where the probabilities for choosing actionfor $a^{2}_{1}=0.5$ and for $a^{2}_{2}=0.5$.
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=8.5cm]{images/stochastic.pdf}
-\caption{A Position, which indicates that mixing strategies is important.}
-\label{fig:stochastic}
-\end{center}
-\end{figure}
 
-\section{Conclusion and Future Research}
-\label{sec:conclusion}
+The experiments revealed that the parameter $C$ of the UCT selection strategy was optimal at 13.2. 
+This value is higher than reported in the literature but in Tron, there are only 3 possible moves, therefore it may be beneficial to know where all three moves would lead us. 
+%A high $C$ parameter ensures that the exploration of all nodes is given, which explains the result of the high $C$ parameter
+On the other hand, the tuning of $T$ showed little impact on overall performance. 
+%of the UCT and UCB1-Tuned selection strategy was tuned. After some experiments, the tuning was stopped, because it did not seem to have much impact on the result of the selection strategies. 
+%Therefore, 30 is still used for the parameter $T$. 
+%The parameter $\gamma$ from the EXP3 and Regret Matching selection strategy was tuned to 0.39 and 0.31, respectively, to increase performance of those strategies.\\
+The round-robin tournament, in which every selection strategy played against each other, showed that the sequential UCB1-Tuned algorithm wins on average 63\% of its games and is therefore the winner of the tournament. 
+Generally the sequential strategies perform better than the decoupled strategies, which is especially visible on Board c (see Table~\ref{table:round_robin}), where the UCT and UCB1-Tuned only lost 4\%-19\% of its games against all DUCT strategies and only 28\%-29\% against EXP3 and Regret Matching, respectively. 
+Additionally, the deterministic selection strategies perform better than stochastic selection strategies on $16\times16$ boards, where all deterministic strategies win $>50\%$ and all stochastic win $<50\%$ of their matches. 
+%Already the selection strategies, which are deterministic, but only use a stochastic process to determine their final move, such as DUCT(Mix) and DUCB1-Tuned(Mix), perform way weaker than their counterparts DUCT(Max) and DUCB1-Tuned(Max).\\
+The round-robin tournament on the smaller $6 \times 6$ board showed that if a smaller board is used the performance of the deterministic strategies decrease and the performance of the stochastic strategies increase. 
+This could be due to the fact that as both players come closer together, using a stochastic strategy might be more suitable than a deterministic one.
+For example, the in Figure~\ref{fig:stochastic} both players have two possible moves. If both players choose $a^{p}_{1}$ (``Left''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Right''), Player 1 also wins. The optimal strategy for both players is to play with a mixed strategy, where each action is chosen with probability $0.5$. 
 
-\begin{table}[h]\scriptsize
-\caption{Results of the different selection strategies playing against each other. a,b,c and d stand for the four different boards, which are used in the round-robin tournament. $\pm$ refers to 95\% confidence intervals.}
+\begin{figure}[t]
+\centering
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=\textwidth]{images/stochastic.pdf}
+\end{subfigure}
+~~~
+\begin{subfigure}[c]{0.5\textwidth}
+\scriptsize
 \centering
 \begin{tabular}{|c||c|c|c|c|c|}
 									\hline
@@ -483,27 +542,15 @@ Furthermore, the round-robin tournament on the smaller 6$\times$6 board showed, 
 	EXP3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42$\pm$1.29\%		\\ \hline
 	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41$\pm$1.28\%		\\ \hline
 \end{tabular}
-\label{table:round_robin_results}
-\end{table}
+\end{subfigure}
+\caption{Left: A Position, which indicates that mixing strategies is important. Right: Results of the different selection strategies playing against each other. a,b,c and d stand for the four different boards, which are used in the round-robin tournament. $\pm$ refers to 95\% confidence intervals.}
+\label{fig:example_avgs}
+\end{figure}
 
-\begin{table*}\scriptsize
-\caption{Results of the different selection strategies playing against each other on a 6$\times$6 board. $\pm$ refers to 95\% confidence intervals.}
-\centering
-\begin{tabular}{|c||c|c|c|c|c|c|c|c|c|}
-									\hline
-	6$\times$6 Board	& UCB1T 	& UCT		& DUCT(Max)	& DUCB1T(Max)	& DUCT(Mix)	& DUCB1T(Mix)	& RM	& EXP3	& Total			\\ \hline
-	UCB1T							& -				& 52\%	& 59\%			& 62\%				& 59\%			& 62\%				& 57\%& 61\%	& 59$\pm$2.57\%		\\ \hline
-	UCT								& 48\%		& -			& 55\%			& 61\%				& 57\%			& 56\%				& 60\%& 59\%	& 57$\pm$2.56\%		\\ \hline
-	DUCT(Max)					& 41\%		& 45\%	& -					& 48\%				& 56\%			& 56\%				& 54\%& 60\%	& 52$\pm$2.62\%		\\ \hline
-	DUCB1T(Max)				& 38\%		& 39\%	& 52\%			& -						& 56\%			& 57\%				& 63\%& 61\%	& 52$\pm$2.62\%		\\ \hline
-	DUCT(Mix)					& 41\%		& 43\%	& 44\%			& 44\%				& -					& 53\%				& 50\%& 49\%	& 47$\pm$2.61\%		\\ \hline
-	DUCB1T(Mix)				& 38\%		& 44\%	& 44\%			& 43\%				& 43\%			& -						& 51\%& 54\%	& 46$\pm$2.61\%		\\ \hline
-	RM								& 43\%		& 40\%	& 46\%			& 37\%				& 50\%			& 46\%				& -		& 46\%	& 46$\pm$2.61\%		\\ \hline
-	EXP3							& 39\%		& 41\%	& 40\%			& 39\%				& 51\%			& 41\%				& 54\%& -			& 44$\pm$2.60\%		\\ \hline
-\end{tabular}
-\caption*{UCB1T=UCB1-Tuned, DUCB1T(Max)=DUCB1-Tuned(Max), DUCB1T(Mix)=DUCB1-Tuned(Mix), RM=Regret Matching}
-\label{table:rr_small}
-\end{table*}
+
+
+\section{Conclusion and Future Research}
+\label{sec:conclusion}
 
 In this paper, several selection strategies for the selection phase were introduced, including the deterministic strategies UCT, UCB1-Tuned, DUCT(Max) and DUCB1-Tuned(Max) and the stochastic strategies DUCT(Mix), DUCB1-Tuned(Mix), EXP3 and Regret Matching. All these enhancements were tested in the game of Tron on different boards to see which strategies perform better than others.\\
 Overall, the round-robin tournament showed, that UCB1-Tuned performs the best in the game of Tron. Furthermore the experiments showed, that deterministic strategies are superior to stochastic ones, but also that the performance of stochastic strategies increases as the board gets smaller. It also showed, that the layout of the board has great influences on the outcome of a game.\\
