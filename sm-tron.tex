@@ -523,12 +523,8 @@ For example, the in Figure~\ref{fig:example_avgs} both players have two possible
 %Already the selection strategies, which are deterministic, but only use a stochastic process to determine their final move, such as DUCT(Mix) and DUCB1-Tuned(Mix), perform way weaker than their counterparts DUCT(Max) and DUCB1-Tuned(Max).\\
 
 
-\begin{figure}[t]
+\begin{figure}[h]
 \centering
-\begin{subfigure}[c]{0.3\textwidth}
-\includegraphics[width=\textwidth]{images/stochastic.pdf}
-\end{subfigure}
-~~~
 \begin{subfigure}[c]{0.5\textwidth}
 \scriptsize
 \centering
@@ -545,7 +541,11 @@ For example, the in Figure~\ref{fig:example_avgs} both players have two possible
 	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41 $\pm$ 1.28\%		\\ \hline
 \end{tabular}
 \end{subfigure}
-\caption{Left: A Position, which indicates that mixing strategies is important. Right: Results of the different selection strategies playing against each other. a,b,c and d stand for the four different boards, which are used in the round-robin tournament. $\pm$ refers to 95\% confidence intervals.}
+~~~~~~~
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=\textwidth]{images/stochastic.pdf}
+\end{subfigure}
+\caption{Left: Results of the different selection strategies playing against each other. a,b,c and d stand for the four different boards, which are used in the round-robin tournament. $\pm$ refers to 95\% confidence intervals. Right: A Position, which indicates that mixing strategies is important. }
 \label{fig:example_avgs}
 \end{figure}
 
