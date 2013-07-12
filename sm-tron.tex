@@ -244,10 +244,9 @@ DUCT(max) and DUCT(mix) were first used in general game-playing programs~\cite{f
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=6cm]{images/graph_seq_uct.pdf}~~~~\includegraphics[width=6cm]{images/graph_dec_uct.pdf}
-\caption{(Left) The sequential tree model. Each node represent the child node of the corresponding move. The first level represents Player 1 moves and the second level represents Player 2 moves. 
-L,S and R represents the different moves a player can make. 
-(Right) The stacked matrix model. Each node corresponds to a child node from a combination of moves for Player 1 and Player 2. 
+\includegraphics[width=6cm]{seq-model.pdf}~~~~~~~~~~~~~~~\includegraphics[width=4.4cm]{mat-model.pdf}
+\caption{(Left) The sequential tree model. Each node represent the child node of the corresponding move. The first level represents Player 1 moves (L, U, and R) and the second level represents Player 2 moves (l, u, r). 
+(Right) The stacked matrix model. Each joint move leads to a child node from a combination of moves for Player 1 and Player 2 (only 7 of the 9 joint moves are shown).
 \label{fig:suct_vs_duct}}
 \end{center}
 \end{figure}
@@ -372,30 +371,18 @@ The play-out strategy, which is used in all experiments, is the random strategy 
 
 \begin{figure}
 \centering 
-
-\hspace{-2.7cm}\begin{subfigure}[c]{0.5\textwidth}
+\begin{subfigure}[c]{0.5\textwidth}
 \centering
 \includegraphics[width=\textwidth]{images/boards.png} 
 %\caption{Four different boards are used for the experiments in the round-robin tournament. a,b and c, as well as the empty board, d, of the same size.\label{fig:ex_boards}}
 \end{subfigure}
-~
-\begin{subfigure}[c]{0.3\textwidth}
-%\begin{table}[b]
+~~~~~~~~~
+\begin{subfigure}[c]{0.29\textwidth}
 \centering
-\footnotesize
-%\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the Exp3 algorithm}
-\begin{tabular}{|c||c|c|}
-							\hline
-Parameter			& Reference constant(s)                             & Tuned value	\\ \hline\hline
-    $C$				& $10,3.52$ from~\cite{teuling_tron,cig_paper}	& $1.5$		\\ \hline
-%$T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
-$\gamma$(Exp3) & 0.36~\cite{cig_paper}		& 0.3		\\ \hline
-$\gamma$(Regret Matching)	& 0.36				& 0.3		\\ \hline
-\end{tabular}
-%\label{table:parameter_tuning}
-%\end{table}
+\includegraphics[width=\textwidth]{images/stochastic.pdf}
 \end{subfigure}
-\caption{Left: Different boards are used for the experiments in the round-robin tournament. Right: tuned parameter constants. \label{fig:boards_parms}}
+%\begin{table}[b]
+\caption{Left: Different boards are used for the experiments in the round-robin tournament. Right: A situation whose optimal strategy requires mixing. \label{fig:boards-example}}
 \end{figure}
 
 \begin{table}[t]\scriptsize
@@ -622,12 +609,11 @@ For example, in Figure~\ref{fig:example_avgs} both players have two possible mov
 %The parameter $\gamma$ from the Exp3 and Regret Matching selection strategy was tuned to 0.39 and 0.31, respectively, to increase performance of those strategies.\\
 %Already the selection strategies, which are deterministic, but only use a stochastic process to determine their final move, such as DUCT(mix) and DUCB1-Tuned(mix), perform way weaker than their counterparts DUCT(max) and DUCB1-Tuned(max).\\
 
-
-\begin{figure}[h]
-\centering
-\begin{subfigure}[c]{0.5\textwidth}
+%\begin{minipage}[c]{0.5\textwidth}
+%\scriptsize
+\begin{table}
 \scriptsize
-\centering
+\begin{minipage}{.53\textwidth}
 \begin{tabular}{|c||c|c|c|c|c|}
 									\hline
  Selection Strategy	& a 		  & b 		  & c 		  & d 		  & Total 	\\ \hline
@@ -648,14 +634,26 @@ For example, in Figure~\ref{fig:example_avgs} both players have two possible mov
 %	Exp3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42 $\pm$ 1.29\%		\\ \hline
 %	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41 $\pm$ 1.28\%		\\ \hline
 \end{tabular}
-\end{subfigure}
-~~~~~~~
-\begin{subfigure}[c]{0.3\textwidth}
-\includegraphics[width=\textwidth]{images/stochastic.pdf}
-\end{subfigure}
-\caption{Left: Results of the different selection strategies playing against each other. a,b,c and d stand for the four different boards, which are used in the round-robin tournament. $\pm$ refers to 95\% confidence intervals. Right: A position whose optimal strategy is a mixed distribution. }
+\caption{Results of the different selection strategies playing against each other. $\pm$ refers to 95\% confidence intervals.}
+\end{minipage}
+~~~
+\begin{minipage}{.4\textwidth}
+\scriptsize
+%\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the Exp3 algorithm}
+\begin{tabular}{|c||c|c|}
+							\hline
+Parameter			& Reference constant(s)                             & Tuned value	\\ \hline\hline
+    $C$				& $10,3.52$ from~\cite{teuling_tron,cig_paper}	& $1.5$		\\ \hline
+%$T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
+$\gamma$(Exp3) & 0.36~\cite{cig_paper}		& 0.3		\\ \hline
+$\gamma$(Regret Matching)	& 0.36				& 0.3		\\ \hline
+\end{tabular}
+%\label{table:parameter_tuning}
+%\end{table}
+\caption{Right: A position whose optimal strategy is a mixed distribution.}
 \label{fig:example_avgs}
-\end{figure}
+\end{minipage}
+\end{table}
 
 \section{Conclusion and Future Research}
 \label{sec:conclusion}
