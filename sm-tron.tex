@@ -142,7 +142,7 @@ Each cell of the matrix corresponds to a joint move, \ie a move chosen by both p
 This is a more accurate representation of the underlying game since players are not able to base their current decision after having seen the other player's current move choice. 
 This is the model used in~\cite{cig_paper} and \cite{mcts_goofspiel}.
 
-A novel contribution of this paper is the comparison of MCTS applied in these two different models. 
+%A novel contribution of this paper is the comparison of MCTS applied in these two different models. 
 
 \section{Tron \& MCTS}
 \label{sec:tron_specific_mcts}
@@ -178,7 +178,9 @@ Tron is played in a grid-like environment and so often the two players become se
 %\subsubsection*{Predictive Expansion Strategy}
 %\label{subsec:pes}
 %In the game of Tron, it is common that the players get separated from each other. 
-Also, when players are separated, there is no need to let a play-out decide which player would win. Instead, it can be predicted by the Predictive Expansion Strategy (PES)~\cite{teuling_tron}. PES is used to avoid play-outs when they are not necessary. Each time the non-root player tries to expand a node, the PES checks whether the two players are separated from each other. If this is the case, space estimation is used to predict which player would win. Finally, the expanded node becomes a leaf node and no more play-outs have to be done when reaching this node again. %The saved time can be used for more simulations. 
+Also, when players are separated, there is no need to let a play-out decide which player would win. Instead, it can be predicted by the Predictive Expansion Strategy (PES)~\cite{teuling_tron}. PES is used to avoid play-outs when they are not necessary. Each time the non-root player tries to expand a node, the PES checks whether the two players are separated from each other. If this is the case, space estimation is used to predict which player would win. Finally, the expanded node becomes a leaf node and no more play-outs have to be done when reaching this node again. 
+
+%The saved time can be used for more simulations. 
 
 %\subsubsection*{Play-out Cut-Off}
 %\label{subsec:play_out_cut_off}
@@ -359,13 +361,14 @@ The final move is selected using the average of all the mixed strategies used ov
 In this section the different selection and backpropagation strategies are evaluated. 
 %Because the framework, which was implemented by Teuling~\cite{teuling_tron}, used for this experiments is based on sequential UCT, DUCT, Exp3 and Regret Matching were not optimally implemented. 
 %Therefore it would be an unfair comparison, if all agents would have the same thinking time. 
-In order to make it a fair comparison between the two search tree models using a common implementation, each agent is allowed to simulate a fixed number of simulations (100,000).
+In order to make it a fair comparison between the two search tree models using a common implementation, each agent is allowed to simulate a fixed number of simulations (100,000) which took roughly one second on modern hardware. 
 
 %In the case of this experiment the number is set to 100,000. 
-The experiments are run on four different boards, three with obstacles (see Figure~\ref{fig:boards_parms}) and an empty board (d)), all with dimensions of $13 \times 13$. 
-On each board 200 games are played with swapped starting positions. 
+The experiments are run on four different boards, three with obstacles (see Figure~\ref{fig:boards-example}) and an empty board (d)), all with dimensions of $13 \times 13$. On each board 500 games are played per player matchup.
 %to assure that none of the agents are benefiting from starting in a certain position. 
-The play-out strategy, which is used in all experiments, is the random strategy with play-out cut-offs enhancement mentioned in Section~\ref{sec:tron_specific_mcts}. The expansion strategy uses the predictive expansion strategy.
+The play-out strategy, which is used in all experiments, is the random strategy with play-out cut-offs enhancement mentioned in Section~\ref{sec:tron_specific_mcts}. 
+However, to avoid slowing down playouts too much, they are only applied every 10 steps. 
+The expansion strategy uses the predictive expansion strategy.
 
 %Some parameters are tuned in Subsection~\ref{subsec:parameter_tuning} and the several selection strategies introduced in this paper, are tested against each other in a round-robin tournament in Subsection~\ref{subsec:round_robin}. In addition another round-robin tournament is conducted on a smaller $6 \times 6$ board to see how the results differ from the ones conducted in the round-robin tournament on the large boards.
 
@@ -376,13 +379,13 @@ The play-out strategy, which is used in all experiments, is the random strategy 
 \includegraphics[width=\textwidth]{images/boards.png} 
 %\caption{Four different boards are used for the experiments in the round-robin tournament. a,b and c, as well as the empty board, d, of the same size.\label{fig:ex_boards}}
 \end{subfigure}
-~~~~~~~~~
+~~~~~~~~~~~~~~
 \begin{subfigure}[c]{0.29\textwidth}
 \centering
 \includegraphics[width=\textwidth]{images/stochastic.pdf}
 \end{subfigure}
 %\begin{table}[b]
-\caption{Left: Different boards are used for the experiments in the round-robin tournament. Right: A situation whose optimal strategy requires mixing. \label{fig:boards-example}}
+\caption{Left: Different boards are used for the experiments in the round-robin tournament. Right: A situation whose optimal strategies require mixing with probability distribution $(0.5, 0.5)$. \label{fig:boards-example}}
 \end{figure}
 
 \begin{table}[t]\scriptsize
@@ -469,7 +472,7 @@ The play-out strategy, which is used in all experiments, is the random strategy 
 \end{tabular}
 %\caption{Results of the different selection strategies playing on Board a,b,c and d.}
 \caption{Results of the different selection strategies playing on boards a, b, c and d. 
-Each percentages refers to the win rate of the row player. \label{table:round_robin}}
+Each percentage refers to the win rate of the row player. \label{table:round_robin}}
 %UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching;
 \end{table}
 
@@ -497,7 +500,8 @@ Each percentages refers to the win rate of the row player. \label{table:round_ro
 %  Exp3 			    & 34\%	& 35\% 		& 39\%		  & 49\%		& 35\%		& 47\%		& -	    & 52\%				\\ 	\hline
 %  RM		 	      & 36\% 	& 37\%		& 40\%		  & 51\%		& 33\%		& 48\%		& 48\%	& -				    \\ 	\hline
 \end{tabular}
-\caption{Overall results of the different selection strategies playing against each other over all boards.}
+\caption{Overall results of the different selection strategies playing against each other over all boards.
+Each percentage refers to the win rate of the row player. }
 %Here, UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching}
 \label{table:round_robin_total}
 \end{table}
@@ -524,7 +528,8 @@ Each percentages refers to the win rate of the row player. \label{table:round_ro
 %	RM								& 43\%		& 40\%	& 46\%			& 37\%				& 50\%			& 46\%				& -		& 46\%	& 46 $\pm$ 2.61 \%		\\ \hline
 %	Exp3							& 39\%		& 41\%	& 40\%			& 39\%				& 51\%			& 41\%				& 54\%& -			& 44 $\pm$ 2.60 \%		\\ \hline
 \end{tabular}
-\caption{Results of the different selection strategies playing against each other on a $6\times6$ board. }%$\pm$ refers to 95\% confidence intervals.}
+\caption{Results of the different variants playing against each other on a $6\times6$ board. 
+Each percentage refers to the win rate of the row player. }%$\pm$ refers to 95\% confidence intervals.}
 %\caption*{UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching}
 \label{table:rr_small}
 \end{table}
@@ -535,13 +540,13 @@ Each percentages refers to the win rate of the row player. \label{table:round_ro
 
 Before running performance experiments, some parameters ($C$ in UCT, $\gamma$ in Exp3 and Regret Matching) are tuned. 
 %This is done to assure that the different strategies perform optimally. 
-As reference constants, values are used which were taken from different sources~\cite{teuling_tron,cig_paper}. Parameter $C$, which is used in Equation~\ref{uct}) was tuned by letting a UCT player playing games against a MCTS player with a random selection and a random play-out strategy. 
-After 10 games the value of the parameter $C$ was slightly increased or decreased, depending on how strong the UCT player played. 
-Starting with the reference constant, 120 games were played in order to find a value for $C$ which did not change significantly.
-Parameter $T$ and $\gamma \in [0,1]$ were tuned similarly.
+As reference constants, values are used which were taken from different sources~\cite{teuling_tron,cig_paper}. Parameters $C$ and 
+$\gamma \in [0,1]$ were tuned manually by playing several games against other variants. 
+%After 10 games the value of the parameter $C$ was slightly increased or decreased, depending on how strong the UCT player played. 
+%Starting with the reference constant, 120 games were played in order to find a value for $C$ which did not change significantly.
 %The parameter $T$ used in UCT and UCB1-Tuned, which is the threshold before either UCT or UCB1-Tuned is applied as a selection strategy was tuned in the same way as the parameter $C$. This parameter tuning showed the same result as shown by Teuling~\cite{teuling_tron}, namely that the parameter $T$ does not influence the performance of UCT and UCB1-Tuned.\\
 %The parameter $\gamma \in \[$ of Exp3 and Regret Matching was also tuned in the same way as the parameter $C$ with the only difference being that $\gamma$ must be in the interval of $[0,1]$.\\
-The tuned values can be seen in Figure~\ref{fig:boards_parms}.
+The tuned values can be seen in Table~\ref{tbl:tunedvals}.
 %The reference constants from previous work were $(C, T, \gamma(Exp3), \gamma(
 
 \subsection{Round-Robin Tournaments}
@@ -549,9 +554,9 @@ The tuned values can be seen in Figure~\ref{fig:boards_parms}.
 
 In this subsection, the performance of several players using different selection and backpropagation strategies are compared. 
 This is done by playing matchups (of 500 games) of each player type against every other player type. 
-Table~\ref{table:round_robin} presents the results of the games on all four maps and Table~\ref{table:round_robin} presents the average
+Table~\ref{table:round_robin} presents the results of the games on all four maps and Table~\ref{table:round_robin_total} presents the average
 performance of all players.
-Figure~\ref{fig:example_avgs} presents the average performance of each agent over all maps. 
+Table~\ref{tbl:overall-avgs} presents the average performance of each agent over all maps. 
 
 %From this, we see that sequential UCT and UCB1-Tuned selection strategies perform best overall.
 From this, we see that the UCB1-Tuned variants perform best overall, with the decoupled version 
@@ -594,8 +599,9 @@ From the results in Table~\ref{table:rr_small},
 %ones, but nonetheless perform better on the smaller board than on the larger board.
 the round-robin tournament on the smaller $6 \times 6$ board the performance of the 
 deterministic strategies decrease and the performance of the stochastic strategies increase. 
-This could be due to the fact that as both players come closer together, using a stochastic strategy might be more suitable than a deterministic one.
-For example, in Figure~\ref{fig:example_avgs} both players have two possible moves. If both players choose $a^{p}_{1}$ (``Left''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Right''), Player 1 also wins. The optimal strategy for both players is to play with a mixed strategy, where each move is chosen with probability $0.5$. 
+This could be due to the fact that as both players come closer together, there is less opportunity to make mistakes. 
+Also, the stochastic strategies could be finding more situations where mixing among strategies is necessary.
+For example, in Figure~\ref{fig:boards-example} both players have two possible moves. If both players choose $a^{p}_{1}$ (``Left''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Right''), Player 1 also wins. The optimal strategy for both players is to play with a mixed strategy, where each move is chosen with probability $0.5$. 
 
 %\subsubsection*{Discussion}
 %\label{subsec:discussion}
@@ -613,10 +619,10 @@ For example, in Figure~\ref{fig:example_avgs} both players have two possible mov
 %\scriptsize
 \begin{table}
 \scriptsize
-\begin{minipage}{.53\textwidth}
+\begin{minipage}{.51\textwidth}
 \begin{tabular}{|c||c|c|c|c|c|}
 									\hline
- Selection Strategy	& a 		  & b 		  & c 		  & d 		  & Total 	\\ \hline
+ Variant	& a 		  & b 		  & c 		  & d 		  & Total 	\\ \hline
  DUCB1T(max) & 65\% & 62\% & 62\% & 59\% & 62.32 $\pm$ 0.56\% \\ \hline
  DUCB1T(mix) & 56\% & 57\% & 53\% & 53\% & 54.82 $\pm$ 0.61\% \\ \hline
  UCB1T & 58\% & 57\% & 49\% & 54\% & 54.32 $\pm$ 0.55\% \\ \hline
@@ -634,9 +640,9 @@ For example, in Figure~\ref{fig:example_avgs} both players have two possible mov
 %	Exp3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42 $\pm$ 1.29\%		\\ \hline
 %	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41 $\pm$ 1.28\%		\\ \hline
 \end{tabular}
-\caption{Results of the different selection strategies playing against each other. $\pm$ refers to 95\% confidence intervals.}
+\caption{Results of the different variants played against each other. $\pm$ refers to 95\% confidence intervals. \label{tbl:overall-avgs}}
 \end{minipage}
-~~~
+~~~~~
 \begin{minipage}{.4\textwidth}
 \scriptsize
 %\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the Exp3 algorithm}
@@ -646,30 +652,37 @@ Parameter			& Reference constant(s)                             & Tuned value	\\
     $C$				& $10,3.52$ from~\cite{teuling_tron,cig_paper}	& $1.5$		\\ \hline
 %$T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
 $\gamma$(Exp3) & 0.36~\cite{cig_paper}		& 0.3		\\ \hline
-$\gamma$(Regret Matching)	& 0.36				& 0.3		\\ \hline
+$\gamma$(Regret Matching)	& 0.025~\cite{mcts_goofspiel}				& 0.3		\\ \hline
 \end{tabular}
 %\label{table:parameter_tuning}
 %\end{table}
-\caption{Right: A position whose optimal strategy is a mixed distribution.}
-\label{fig:example_avgs}
+\caption{Tuned parameter values. \label{tbl:tunedvals} }
 \end{minipage}
 \end{table}
 
 \section{Conclusion and Future Research}
 \label{sec:conclusion}
 
-In this paper, several selection and backpropagation strategies were introduced for MCTS in Tron, including Sequential and Decoupled UCT, Sequential and Decoupled UCB1-Tuned, Exp3 and Regret Matching. 
+In this paper, several selection and backpropagation strategies were introduced for MCTS in Tron.
+%including Sequential and Decoupled UCT, Sequential and Decoupled UCB1-Tuned, Exp3 and Regret Matching. 
 The performance of these variants were tested in the game of Tron on different boards.
-Overall, the round-robin tournament showed that the UCB1-Tuned variants perform best in the game of Tron. 
-Furthermore the experiments showed that deterministic strategies perform generally better than the stochastic strategies.
+Overall, the round-robin tournament showed that the UCB1-Tuned variants perform best. % in the game of Tron. 
+Furthermore the experiments showed that deterministic strategies perform generally better than the stochastic strategies in Tron.
 The experiments also suggest that the layout of the board can influence the performance of a search algorithm.
 
 For future research, we aim to do more experiments with different boards. 
 %in order to determine why some boards (as Board c) create more difficulties for the decoupled strategies.\\
-In addition, the selection strategy Exp3 can be enhanced by tuning parameter $\eta$.
-Moreover, a hybrid selection strategy could be tested which uses a deterministic strategy if both players are far away from each other and a stochastic one as soon as both players come fairly close to each other. 
+%In addition, the selection strategy Exp3 can be enhanced by tuning parameter $\eta$.
+In addition, a hybrid selection strategy could be tested which uses a deterministic strategy if both players are far away from each other and a stochastic one as soon as both players come fairly close to each other. 
 %This hybrid selection strategy would indicate, if the assumption made in this paper, that stochastic strategies perform better when both players are close to each other, is correct.
 
+\vspace{0.2cm}
+\noindent {\bf Acknowledgements} {\small This work is partially funded by MARBLE: Maastricht
+Research Based Learning and the Netherlands Organisation
+for Scientific Research (NWO) in the framework of the project
+Go4Nature, grant number 612.000.938. }
+
+\vspace{-0.5cm}
 \bibliographystyle{plain}
 \bibliography{sm-tron}
 
