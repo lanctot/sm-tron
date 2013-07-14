@@ -607,7 +607,7 @@ Table~\ref{tbl:overall-avgs} presents the average performance of each agent over
 
 %From this, we see that sequential UCT and UCB1-Tuned selection strategies perform best overall.
 From this, we see that the UCB1-Tuned variants perform best overall, with the decoupled version 
-winning significantly (8\%) more often than its next three competitors. 
+winning significantly (7.5\%) more often than its next three competitors. 
 Given that the top three players use UCB1-Tuned, including DUCB1T(mix), it appears that a better way of 
 performing exploration has a bigger impact on performance than the choice of the game model 
 (sequential versus stacked matrix).
@@ -620,8 +620,9 @@ The relative rank of DUCB1T(max), DUCT(max), and Exp3 presented here on board (d
 previous results on the open map~\cite{cig_paper}. 
 Sequential UCT performed relatively well, winning 51.4-54.3\% overall despite using a 
 sequential model of the game. 
-This could be because Sequential UCT learns to play safely since it chooses the move that minimizes over
-the opponent's counter-moves. In fact, in the classic minimax setting the value computed in this model 
+This could be because Sequential UCT learns to play safely since it chooses the move that leads to a situation
+where the advantage of the opponent's best counter-move is minimized. In fact, in the classic minimax setting the 
+value computed in this model 
 is a lower bound of the true optimal value~\cite{Bosansky13Using}. 
 
 As in Goofspiel~\cite{mcts_goofspiel}, Regret Matching outperforms Exp3 and DUCT(mix). 
@@ -638,18 +639,18 @@ tend to perform better since they avoid mistakes.
 
 %sequential MCTS out performs the decoupled versions of MCTS.
 %
-The same round-robin tournament was repeated on a smaller ($6 \times 6$) board. 
+The round-robin tournament was repeated on a smaller ($6 \times 6$) board. 
 From the results in Table~\ref{table:rr_small}, 
 %generally the win rates get closer to 50\%.
 %Since the board smaller, most of the variants can often compute the optimal choice. 
 %we see that deterministic selection strategies are still doing better that stochastic 
 %ones, but nonetheless perform better on the smaller board than on the larger board.
-the round-robin tournament on the smaller $6 \times 6$ board the relative performance difference are less extreme, possibly
+the tournament on the smaller $6 \times 6$ board the relative performance difference are less extreme, possibly
 because each one is acting closer to optimally and there is less opportunity to make mistakes.
 The deterministic strategies decrease and the performance of the stochastic strategies increase, with Regret Matching 
-performing best in the small board, possibly because the stochastic strategies could be finding more situations where mixing 
-among strategies is necessary. 
-For example, in Figure~\ref{fig:boards-example} both players have two possible moves. If both players choose $a^{p}_{1}$ (``Left''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Right''), Player 1 also wins. The optimal strategy for both players is to play with a mixed strategy, where each move is chosen with probability $0.5$. 
+performing best in the small board, possibly because the stochastic strategies are finding more situations where mixing 
+is important. 
+For example, in Figure~\ref{fig:boards-example} both players have two possible moves. If both players choose $a^{p}_{1}$ (``Up''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Down''), Player 1 also wins. The optimal strategy for both players is to play with a mixed strategy, where each move is chosen with probability $0.5$. 
 
 %\subsubsection*{Discussion}
 %\label{subsec:discussion}
