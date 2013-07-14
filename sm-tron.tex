@@ -84,7 +84,7 @@ Monte Carlo Tree Search (MCTS)~\cite{chaslot_phd,coulom,kocsis} builds up a sear
 %This paper deals with MCTS, but not on the aspect of turn-taking board games, but on the application of it to simultaneous move games, such as Tron. 
 
 In Tron, two players move simultaneously through a discrete grid and at each move create a wall behind them. 
-The first applications of MCTS to Tron~\cite{tron_cig,teuling_tron} applied standard (sequential) UCT while treating the game as a turn-based alternating move game in the search tree. A comparison of selection and backpropagation strategies in simultaneous move MCTS are presented in \cite{cig_paper}. However, results are only presented for a single map and there is no comparison to sequential UCT previously used in this domain.
+The first applications of MCTS to Tron~\cite{teuling_tron,tron_cig} applied standard (sequential) UCT while treating the game as a turn-based alternating move game in the search tree. A comparison of selection and backpropagation strategies in simultaneous move MCTS are presented in \cite{cig_paper}. However, results are only presented for a single map and there is no comparison to sequential UCT previously used in this domain.
 Throughout this paper, we investigate the impact of different selection and backpropagation strategies on the playing performance of MCTS in the game of Tron.
 
 The paper is organized as follows.
@@ -98,7 +98,7 @@ Section~\ref{sec:tron_specific_mcts} deals with how Monte Carlo Tree Search hand
 %\section{Monte Carlo Tree Search}
 %\label{sec:mcts}
 Monte Carlo Tree Search (MCTS)~\cite{coulom, kocsis} is a technique used for decision-making in the turn-based, 
-sequential problems. 
+sequential games. 
 %These decisions are usually move planning decisions in abstract games. 
 To make a decision, MCTS makes use of simulations combined with an incrementally-built search tree. 
 In the search tree, each node represents a state in the game. To evaluate a state, a game is simulated in self-play from the current (root) state of the game until the game is finished. The first part of each simulation will encounter states that are part of the search tree. Which states are encountered in this first part depends on the moves selected during the simulation (the so-called {\it selection strategy}). When MCTS encounters a state that is not in the tree, it is {\it expanded} (added to the tree) and then a {\it play-out policy} takes over choosing successor states until the end of the game. 
@@ -131,7 +131,7 @@ There are two models to handle the simultaneous moves that occur in Tron.
 
 The first model, used to implement Sequential UCT, ignores the presence of simultaneous moves and treats the game as a sequential turn-based game inside the search tree. 
 We call this the {\it sequential tree model}. 
-In practice, this worked well in Tron~\cite{tron_cig,teuling_tron}, except it clearly favours one player which is especially problematic when players are close to each other. 
+In practice, this worked well in Tron~\cite{teuling_tron,tron_cig}, except it clearly favours one player which is especially problematic when players are close to each other. 
 %Therefore, in our version of Tron we add an exception to the expansion phase. If the first player moves to a position that the second player can also move to, the opponent is still able to move there to achieve a draw rather than a loss~\cite{teuling_tron}. 
 In this model, the game is sequential inside the search tree, until a leaf node is reached. The play-outs are then simulated as a simultaneous game~\cite{teuling_tron}. 
 In this paper, the player running the search always moves first. 
@@ -150,7 +150,7 @@ This is the model used in~\cite{cig_paper} and \cite{mcts_goofspiel}.
 %\label{sec:tron}
 %The game of Tron, also known as Light-Cycle Racing, originates from the movie Tron released in 1982. The game is played in a grid like environment, where motorcycles can only drive on the grid, i.e. only drive forward or make 90 degree turns. In addition, the motorcycles create a wall behind them as they drive through the world.\\
 %The game which is investigated in this paper,
-Tron originates from the 1982 movie with the same name. It is a two-player game (See left part of Figure~\ref{fig:tron-mcts}) played on discrete grids possibly obstructed by walls. In addition, the maps are mostly symmetric so that none of the players have an advantage. Unlike sequential turn-taking games where payers play consecutively, at each step in Tron both players move simultaneously. The game is won if opponent crashes into a wall or moves off the board. If both players crash at the same turn into a wall, the game ends in a draw.
+Tron originates from the 1982 movie with the same name. It is a two-player game (see left part of Figure~\ref{fig:tron-mcts}) played on discrete grids possibly obstructed by walls. In addition, the maps are mostly symmetric so that none of the players have an advantage. Unlike sequential turn-taking games where payers play consecutively, at each step in Tron both players move simultaneously. The game is won if opponent crashes into a wall or moves off the board. If both players crash at the same turn into a wall, the game ends in a draw.
 %To create an intelligent agent for this game is a challenging task, especially for the first moves, many computations have to be done in order to make a profound decision on which move to choose.
 
 
@@ -242,12 +242,13 @@ When selecting a child node, DUCT applies the default UCB1 algorithm which was d
 The final move to be played, after many simulations, can be selected in two different ways. The first, DUCT(max), selects the move with the most visits. 
 DUCT(mix) normalizes the visit counts and samples a move according to this distribution, \ie using a mixed strategy \cite{mcts_goofspiel}. 
 %A mixed strategy is constructed such that the probability of each action being played corresponds to the value of the normalized values.
-DUCT(max) and DUCT(mix) were first used in general game-playing programs~\cite{finnson_master,Shafiei09}.
+DUCT(max) was first used in general game-playing programs~\cite{finnson_master}. DUCT(mix) was first proposed by \cite{Shafiei09} and was also applied 
+in a small Poker game \cite{Ponsen11Computing}. 
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=6cm]{seq-model.pdf}~~~~~~~~~~~~~~~\includegraphics[width=4.4cm]{mat-model.pdf}
-\caption{(Left) The sequential tree model. Each node represent the child node of the corresponding move. The first level represents Player 1 moves (L, U, and R) and the second level represents Player 2 moves (l, u, r). 
+\caption{(Left) The sequential tree model. Each node represents the child node of the corresponding move. The first level represents Player 1 moves (L, U, and R) and the second level represents Player 2 moves (l, u, r). 
 (Right) The stacked matrix model. Each joint move leads to a child node from a combination of moves for Player 1 and Player 2 (only 7 of the 9 joint moves are shown).
 \label{fig:suct_vs_duct}}
 \end{center}
@@ -358,17 +359,17 @@ The final move is selected using the average of all the mixed strategies used ov
 \section{Experiments}
 \label{sec:experiments}
 
-In this section the different selection and backpropagation strategies are evaluated. 
+In this section the MCTS variants are evaluated. 
 %Because the framework, which was implemented by Teuling~\cite{teuling_tron}, used for this experiments is based on sequential UCT, DUCT, Exp3 and Regret Matching were not optimally implemented. 
 %Therefore it would be an unfair comparison, if all agents would have the same thinking time. 
-In order to make it a fair comparison between the two search tree models using a common implementation, each agent is allowed to simulate a fixed number of simulations (100,000) which took roughly one second on modern hardware. 
+In order to make it a fair comparison between the two search tree models using a common implementation, each agent is allowed to simulate a fixed number of simulations (100,000) which took roughly one second on an AMD Opteron 6174 running at 2.2 Ghz.
 
 %In the case of this experiment the number is set to 100,000. 
-The experiments are run on four different boards, three with obstacles (see Figure~\ref{fig:boards-example}) and an empty board (d)), all with dimensions of $13 \times 13$. On each board 500 games are played per player matchup.
+The experiments are run on four different boards, three with obstacles (see Figure~\ref{fig:boards-example}) and an empty board (d)), all with dimensions of $13 \times 13$. On each board 500 games are played per player matchup, with sides swapped halfway through.
 %to assure that none of the agents are benefiting from starting in a certain position. 
 The play-out strategy, which is used in all experiments, is the random strategy with play-out cut-offs enhancement mentioned in Section~\ref{sec:tron_specific_mcts}. 
 However, to avoid slowing down playouts too much, they are only applied every 10 steps. 
-The expansion strategy uses the predictive expansion strategy.
+The predictive expansion strategy is also used.
 
 %Some parameters are tuned in Subsection~\ref{subsec:parameter_tuning} and the several selection strategies introduced in this paper, are tested against each other in a round-robin tournament in Subsection~\ref{subsec:round_robin}. In addition another round-robin tournament is conducted on a smaller $6 \times 6$ board to see how the results differ from the ones conducted in the round-robin tournament on the large boards.
 
@@ -506,6 +507,52 @@ Each percentage refers to the win rate of the row player. }
 \label{table:round_robin_total}
 \end{table}
 
+%\begin{minipage}[c]{0.5\textwidth}
+%\scriptsize
+\begin{table}[h!]
+\scriptsize
+\begin{minipage}{.51\textwidth}
+\begin{tabular}{|c||c|c|c|c|c|}
+									\hline
+ Variant	& a 		  & b 		  & c 		  & d 		  & Total 	\\ \hline
+ DUCB1T(max) & 65\% & 62\% & 62\% & 59\% & 62.32 $\pm$ 0.56\% \\ \hline
+ DUCB1T(mix) & 56\% & 57\% & 53\% & 53\% & 54.82 $\pm$ 0.61\% \\ \hline
+ UCB1T & 58\% & 57\% & 49\% & 54\% & 54.32 $\pm$ 0.55\% \\ \hline
+        RM & 56\% & 52\% & 51\% & 53\% & 53.13 $\pm$ 0.62\% \\ \hline
+   UCT & 47\% & 54\% & 55\% & 49\% & 51.39 $\pm$ 0.55\% \\ \hline
+   DUCT(max) & 43\% & 54\% & 49\% & 50\% & 49.05 $\pm$ 0.61\% \\ \hline
+   DUCT(mix) & 39\% & 40\% & 43\% & 36\% & 39.51 $\pm$ 0.64\% \\ \hline
+      Exp3 & 35\% & 24\% & 38\% & 45\% & 35.47 $\pm$ 0.61\% \\ \hline
+%	UCB1-Tuned		      & 57\%	  & 58\%		& 78\%		& 58\%		& 63 $\pm$ 1.26\%		\\ \hline
+%	UCT			            & 59\%		& 55\%		& 76\%		& 57\%		& 61 $\pm$ 1.28\%		\\ \hline
+%	DUCB1-Tuned(max)	  & 58\%		& 58\%		& 48\%		& 57\%		& 55 $\pm$ 1.30\%		\\ \hline
+%	DUCT(max)		        & 56\%		& 53\%		& 37\%		& 57\%		& 51 $\pm$ 1.31\%		\\ \hline
+%	DUCT(mix)		        & 44\%		& 46\%		& 39\%		& 47\%		& 45 $\pm$ 1.30\%		\\ \hline
+%	DUCB1-Tuned(mix)	  & 43\%		& 44\%		& 38\%		& 42\%		& 42 $\pm$ 1.29\%		\\ \hline
+%	Exp3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42 $\pm$ 1.29\%		\\ \hline
+%	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41 $\pm$ 1.28\%		\\ \hline
+\end{tabular}
+\caption{Results of the different variants played against each other. $\pm$ refers to 95\% confidence intervals. \label{tbl:overall-avgs}}
+\end{minipage}
+~~~~~
+\begin{minipage}{.4\textwidth}
+\scriptsize
+%\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the Exp3 algorithm}
+\begin{tabular}{|c||c|c|}
+							\hline
+Parameter			& Reference constant(s)                             & Tuned value	\\ \hline\hline
+    $C$				& $10,3.52$ from~\cite{teuling_tron,cig_paper}	& $1.5$		\\ \hline
+%$T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
+$\gamma$(Exp3) & 0.36~\cite{cig_paper}		& 0.3		\\ \hline
+$\gamma$(Regret Matching)	& 0.025~\cite{mcts_goofspiel}				& 0.3		\\ \hline
+\end{tabular}
+%\label{table:parameter_tuning}
+%\end{table}
+\caption{Tuned parameter values. \label{tbl:tunedvals} }
+\end{minipage}
+\end{table}
+
+
 \begin{table}[h!]\scriptsize
 \centering
 \begin{tabular}{|c||c|c|c|c|c|c|c|c||c|}
@@ -571,7 +618,7 @@ performing exploration has a bigger impact on performance than the choice of the
 %Furthermore, the largest performance gap between sequential and simultaneous MCTS is in Board c. 
 The relative rank of DUCB1T(max), DUCT(max), and Exp3 presented here on board (d) are consistent with 
 previous results on the open map~\cite{cig_paper}. 
-Sequential UCT performed relatively well, winning 51.39-54.32\% overall despite using a 
+Sequential UCT performed relatively well, winning 51.4-54.3\% overall despite using a 
 sequential model of the game. 
 This could be because Sequential UCT learns to play safely since it chooses the move that minimizes over
 the opponent's counter-moves. In fact, in the classic minimax setting the value computed in this model 
@@ -616,50 +663,6 @@ For example, in Figure~\ref{fig:boards-example} both players have two possible m
 %The parameter $\gamma$ from the Exp3 and Regret Matching selection strategy was tuned to 0.39 and 0.31, respectively, to increase performance of those strategies.\\
 %Already the selection strategies, which are deterministic, but only use a stochastic process to determine their final move, such as DUCT(mix) and DUCB1-Tuned(mix), perform way weaker than their counterparts DUCT(max) and DUCB1-Tuned(max).\\
 
-%\begin{minipage}[c]{0.5\textwidth}
-%\scriptsize
-\begin{table}
-\scriptsize
-\begin{minipage}{.51\textwidth}
-\begin{tabular}{|c||c|c|c|c|c|}
-									\hline
- Variant	& a 		  & b 		  & c 		  & d 		  & Total 	\\ \hline
- DUCB1T(max) & 65\% & 62\% & 62\% & 59\% & 62.32 $\pm$ 0.56\% \\ \hline
- DUCB1T(mix) & 56\% & 57\% & 53\% & 53\% & 54.82 $\pm$ 0.61\% \\ \hline
- UCB1T & 58\% & 57\% & 49\% & 54\% & 54.32 $\pm$ 0.55\% \\ \hline
-        RM & 56\% & 52\% & 51\% & 53\% & 53.13 $\pm$ 0.62\% \\ \hline
-   UCT & 47\% & 54\% & 55\% & 49\% & 51.39 $\pm$ 0.55\% \\ \hline
-   DUCT(max) & 43\% & 54\% & 49\% & 50\% & 49.05 $\pm$ 0.61\% \\ \hline
-   DUCT(mix) & 39\% & 40\% & 43\% & 36\% & 39.51 $\pm$ 0.64\% \\ \hline
-      Exp3 & 35\% & 24\% & 38\% & 45\% & 35.47 $\pm$ 0.61\% \\ \hline
-%	UCB1-Tuned		      & 57\%	  & 58\%		& 78\%		& 58\%		& 63 $\pm$ 1.26\%		\\ \hline
-%	UCT			            & 59\%		& 55\%		& 76\%		& 57\%		& 61 $\pm$ 1.28\%		\\ \hline
-%	DUCB1-Tuned(max)	  & 58\%		& 58\%		& 48\%		& 57\%		& 55 $\pm$ 1.30\%		\\ \hline
-%	DUCT(max)		        & 56\%		& 53\%		& 37\%		& 57\%		& 51 $\pm$ 1.31\%		\\ \hline
-%	DUCT(mix)		        & 44\%		& 46\%		& 39\%		& 47\%		& 45 $\pm$ 1.30\%		\\ \hline
-%	DUCB1-Tuned(mix)	  & 43\%		& 44\%		& 38\%		& 42\%		& 42 $\pm$ 1.29\%		\\ \hline
-%	Exp3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42 $\pm$ 1.29\%		\\ \hline
-%	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41 $\pm$ 1.28\%		\\ \hline
-\end{tabular}
-\caption{Results of the different variants played against each other. $\pm$ refers to 95\% confidence intervals. \label{tbl:overall-avgs}}
-\end{minipage}
-~~~~~
-\begin{minipage}{.4\textwidth}
-\scriptsize
-%\caption{Results of the parameter-tuning of parameters $C$ and $T$ from the UCT Algorithm and from the parameter $\gamma$ of the Exp3 algorithm}
-\begin{tabular}{|c||c|c|}
-							\hline
-Parameter			& Reference constant(s)                             & Tuned value	\\ \hline\hline
-    $C$				& $10,3.52$ from~\cite{teuling_tron,cig_paper}	& $1.5$		\\ \hline
-%$T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
-$\gamma$(Exp3) & 0.36~\cite{cig_paper}		& 0.3		\\ \hline
-$\gamma$(Regret Matching)	& 0.025~\cite{mcts_goofspiel}				& 0.3		\\ \hline
-\end{tabular}
-%\label{table:parameter_tuning}
-%\end{table}
-\caption{Tuned parameter values. \label{tbl:tunedvals} }
-\end{minipage}
-\end{table}
 
 \section{Conclusion and Future Research}
 \label{sec:conclusion}
