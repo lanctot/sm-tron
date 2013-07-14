@@ -670,15 +670,18 @@ For example, in Figure~\ref{fig:boards-example} both players have two possible m
 
 In this paper, several selection and backpropagation strategies were introduced for MCTS in Tron.
 %including Sequential and Decoupled UCT, Sequential and Decoupled UCB1-Tuned, Exp3 and Regret Matching. 
-The performance of these variants were tested in the game of Tron on different boards.
-Overall, the round-robin tournament showed that the UCB1-Tuned variants perform best. % in the game of Tron. 
-Furthermore the experiments showed that deterministic strategies perform generally better than the stochastic strategies in Tron.
-The experiments also suggest that the layout of the board can influence the performance of a search algorithm.
+The performance of these variants were obtained  the game of Tron on different boards.
+Overall, the UCB1-Tuned variants perform best. % in the game of Tron. 
+Furthermore deterministic strategies appear to perform generally better than the stochastic strategies in Tron.
+Experiments also suggest that board layout can influence performance.
 
 For future research, we aim to do more experiments with different boards. 
 %in order to determine why some boards (as Board c) create more difficulties for the decoupled strategies.\\
 %In addition, the selection strategy Exp3 can be enhanced by tuning parameter $\eta$.
-In addition, a hybrid selection strategy could be tested which uses a deterministic strategy if both players are far away from each other and a stochastic one as soon as both players come fairly close to each other. 
+A hybrid selection strategy could be tested which uses a deterministic strategy if both players 
+are far away from each other and a stochastic one as soon as both players come fairly close to each other. 
+Also, one could try purifying the final move distributions by setting the low-probability actions to 0 and renormalizing 
+the remaining probabilities. 
 %This hybrid selection strategy would indicate, if the assumption made in this paper, that stochastic strategies perform better when both players are close to each other, is correct.
 
 \vspace{0.2cm}
