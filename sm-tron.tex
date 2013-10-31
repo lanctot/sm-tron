@@ -8,8 +8,11 @@
 \usepackage{subcaption}
 \usepackage{comment}
 
-\newcommand{\eg}{{\it e.g.,}~}
-\newcommand{\ie}{{\it i.e.,}~}
+%\newcommand{\eg}{{\it e.g.,}~}
+%\newcommand{\ie}{{\it i.e.,}~}
+
+\newcommand{\eg}{{e.g.,}~}
+\newcommand{\ie}{{i.e.,}~}
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
 
 
@@ -66,7 +69,7 @@
 %environment. Please start the first paragraph of your abstract with a \verb+\noindent+ command.
 
 \begin{abstract}
-\noindent This paper investigates Monte Carlo Tree Search (MCTS) for the simultaneous move game Tron. MCTS has been successfully applied to many board games, such as Chess, Checkers and Go. In this paper several variants of MCTS are proposed to adapt MCTS to simultaneous move games. Through the experiments in the test domain in the game of Tron on four different boards, it is shown that deterministic selection strategies such as sequential UCT, UCB1-Tuned and Decoupled UCT perform better than stochastic selection strategies, such as Exp3 and Regret Matching.
+\noindent MCTS has been successfully applied to many sequential games. This paper investigates Monte Carlo Tree Search (MCTS) for the simultaneous move game Tron. In this paper we describe two different ways to model the simultaneous move game, as a standard sequential game and as a stacked matrix game. Several variants are presented to adapt MCTS to simultaneous move games, such as Sequential UCT, Decoupled UCT, Exp3, and a novel stochastic method based on Regret Matching. Through the experiments in the game of Tron on four different boards, it is shown that Decoupled UCB1-Tuned perform best, winning 62.3\% of games overall. We also show that Regret Matching wins 53.1\% of games overall and search techniques that model the game sequentially win 51.4-54.3\% of games overall.
 \end{abstract}
 
 \section{Introduction}
@@ -80,28 +83,31 @@ Classic examples include Chess, Checkers and Go, each of which are simple to lea
 In classic game tree search, game-specific knowledge is used to determine the strength of each position using a static evaluation function. %~\cite{ai_russel_norvig}. 
 If the evaluation function is difficult to design then an alternative approach has to be chosen. 
 
-Monte Carlo Tree Search (MCTS)~\cite{chaslot_phd,coulom,kocsis} builds up a search tree without requiring an evaluation function. Instead, it builds a search tree gradually guided by Monte Carlo simulations. MCTS was initially applied to the game of Go~\cite{coulom} but has since been applied to many different games and settings~\cite{mctssurvey}. This paper focuses on selection and backpropagation strategies in MCTS applied to two-player turn-based simultaneous move games, such as Tron. Some algorithms are investigated in this paper, including sequential UCT~\cite{kocsis} are: UCB1-Tuned, Decoupled UCT, Decoupled UCB1-Tuned, Exp3 and Regret Matching.
+Monte Carlo Tree Search (MCTS)~\cite{chaslot_phd,coulom,kocsis} builds up a search tree without requiring an evaluation function. Instead, it builds a search tree gradually guided by Monte Carlo simulations. MCTS was initially applied to the game of Go~\cite{coulom} but has since been applied to many different games and settings~\cite{mctssurvey}. This paper focuses on selection and backpropagation strategies in MCTS applied to two-player turn-based simultaneous move games, such as Tron. Algorithms investigated in this paper, including sequential UCT~\cite{kocsis}, are: UCB1-Tuned, Decoupled UCT, Decoupled UCB1-Tuned, Exp3 and Regret Matching.
 %This paper deals with MCTS, but not on the aspect of turn-taking board games, but on the application of it to simultaneous move games, such as Tron. 
 
 In Tron, two players move simultaneously through a discrete grid and at each move create a wall behind them. 
-The first applications of MCTS to Tron~\cite{teuling_tron,tron_cig} applied standard (sequential) UCT while treating the game as a turn-based alternating move game in the search tree. A comparison of selection and backpropagation strategies in simultaneous move MCTS are presented in \cite{cig_paper}. However, results are only presented for a single map and there is no comparison to sequential UCT previously used in this domain.
-Throughout this paper, we investigate the impact of different selection and backpropagation strategies on the playing performance of MCTS in the game of Tron.
+The first applications of MCTS to Tron~\cite{teuling_tron,tron_cig} applied standard (sequential) UCT while treating the game as a turn-based alternating move game in the search tree. A comparison of selection and backpropagation strategies in simultaneous move MCTS is presented in \cite{cig_paper}. However, results are only presented for a single map and there is no comparison to sequential UCT previously used in this domain.
+In addition, we introduce a new variant based on Regret Matching, which performs relatively well in practice. 
+Throughout this paper, we investigate the impact of different selection and backpropagation strategies on the playing performance of MCTS in Tron.
 
 The paper is organized as follows.
-It starts with a brief description of the game Tron and Monte Carlo Tree Search in Section~\ref{sec:background}. 
+It starts with a brief description of Tron and MCTS in Section~\ref{sec:background}. 
 %, followed by an introduction to Monte Carlo Tree Search in Section~\ref{sec:mcts}. 
-Section~\ref{sec:tron_specific_mcts} deals with how Monte Carlo Tree Search handles the game specific principles of Tron. In Section~\ref{sec:selection_strategies} the different selection strategies are explained. Afterwards experiments are shown in Section~\ref{sec:experiments} and a conclusion is drawn from the Experiments in Section~\ref{sec:conclusion}. Furthermore, possible future research is also discussed in Section~\ref{sec:conclusion}.
+Section~\ref{sec:tron_specific_mcts} deals with how MCTS handles the game specific principles of Tron. In Section~\ref{sec:selection_strategies} the different selection strategies are explained. Afterwards experiments are shown in Section~\ref{sec:experiments} and a conclusion is drawn from the experiments in Section~\ref{sec:conclusion}. Furthermore, possible future research is also discussed in Section~\ref{sec:conclusion}.
 
 \section{Monte Carlo Tree Search}
 \label{sec:background}
 
 %\section{Monte Carlo Tree Search}
 %\label{sec:mcts}
-Monte Carlo Tree Search (MCTS)~\cite{coulom, kocsis} is a technique used for decision-making in the turn-based, 
+Monte Carlo Tree Search (MCTS)~\cite{coulom, kocsis} is a technique used for decision-making in turn-based, 
 sequential games. 
 %These decisions are usually move planning decisions in abstract games. 
 To make a decision, MCTS makes use of simulations combined with an incrementally-built search tree. 
-In the search tree, each node represents a state in the game. To evaluate a state, a game is simulated in self-play from the current (root) state of the game until the game is finished. The first part of each simulation will encounter states that are part of the search tree. Which states are encountered in this first part depends on the moves selected during the simulation (the so-called {\it selection strategy}). When MCTS encounters a state that is not in the tree, it is {\it expanded} (added to the tree) and then a {\it play-out policy} takes over choosing successor states until the end of the game. 
+In the search tree, each node represents a state in the game. To evaluate a state, a game is simulated in self-play from the current (root) state of the game until the game is finished. The first part of each simulation will encounter states that are part of the search tree. Which states are encountered in this first part depends on the moves selected during the simulation (the so-called {\it selection strategy}). 
+When a state is not in the tree, a {\it play-out policy} chooses successor states until the end of the game.
+MCTS then {\it expands} the tree by adding the first state it encountered along its play-out.
 %In contrast to the selection phase of the simulation, during the play-out phase nodes are not added to the tree. 
 %Play-outs can be done in many different ways, either using a strategy or simply playing random moves. Because one simulation is not a reliable indication whether a move is strong or not, many play-outs are simulated. 
 The result of the simulation is then {\it backpropagated} to every node visited in the simulation up to the root where 
@@ -112,8 +118,8 @@ The right part of Figure~\ref{fig:tron-mcts} illustrates the four different phas
 
 \begin{figure}[t]
 \begin{center}
-\includegraphics[width=4.6cm]{images/tron_field.png} \hspace{0.4cm} \includegraphics[width=9.8cm]{images/mcts_figure.png}
-\caption{(Left) A game in Tron. 41 moves are already played. Player 1 started in the top left corner and Player 2 started in the bottom right corner.
+\includegraphics[width=4.6cm]{images/tron_field.png} \hspace{0.4cm} \includegraphics[width=9.8cm]{images/mcts-figure}
+\caption{(Left) A game in Tron; 41 moves are already played. Player 1 started in the top left corner and Player 2 started in the bottom right corner.
  (Right) The four phases of the Monte Carlo Tree Search. \label{fig:tron-mcts}}
 \end{center}
 \end{figure}
@@ -139,8 +145,9 @@ In this paper, the player running the search always moves first.
 The second model, used to implement simultaneous move MCTS, stores a matrix at each node. 
 We call this the {\it stacked matrix model}.
 Each cell of the matrix corresponds to a joint move, \ie a move chosen by both players simultaneously, and a corresponding child node (successor state). 
-This is a more accurate representation of the underlying game since players are not able to base their current decision after having seen the other player's current move choice. 
-This is the model used in~\cite{cig_paper} and \cite{mcts_goofspiel}.
+This is a more accurate representation of the underlying game since players are not able to influence their current decision 
+after having seen the other player's current move choice. 
+This is the model used in~\cite{mcts_goofspiel} and \cite{cig_paper}.
 
 %A novel contribution of this paper is the comparison of MCTS applied in these two different models. 
 
@@ -150,7 +157,7 @@ This is the model used in~\cite{cig_paper} and \cite{mcts_goofspiel}.
 %\label{sec:tron}
 %The game of Tron, also known as Light-Cycle Racing, originates from the movie Tron released in 1982. The game is played in a grid like environment, where motorcycles can only drive on the grid, i.e. only drive forward or make 90 degree turns. In addition, the motorcycles create a wall behind them as they drive through the world.\\
 %The game which is investigated in this paper,
-Tron originates from the 1982 movie with the same name. It is a two-player game (see left part of Figure~\ref{fig:tron-mcts}) played on discrete grids possibly obstructed by walls. In addition, the maps are mostly symmetric so that none of the players have an advantage. Unlike sequential turn-taking games where payers play consecutively, at each step in Tron both players move simultaneously. The game is won if opponent crashes into a wall or moves off the board. If both players crash at the same turn into a wall, the game ends in a draw.
+Tron originates from the 1982 movie with the same name. It is a two-player game (see left part of Figure~\ref{fig:tron-mcts}) played on discrete grids possibly obstructed by walls. In addition, the maps are mostly symmetric so that none of the players have an advantage. Unlike sequential turn-taking games where payers play consecutively, at each step in Tron both players move simultaneously. The game is won if the opponent crashes into a wall or moves off the board. If both players crash at the same turn into a wall, the game ends in a draw.
 %To create an intelligent agent for this game is a challenging task, especially for the first moves, many computations have to be done in order to make a profound decision on which move to choose.
 
 
@@ -173,7 +180,7 @@ Tron originates from the 1982 movie with the same name. It is a two-player game 
 %\subsubsection*{Space Estimation, Predictive Expansion Strategy, and Play-out Cut-Offs}
 
 %Space Estimation is useful knowledge to have in the game of Tron. 
-Tron is played in a grid-like environment and so often the two players become separated from each other. When this happens, each agent is essentially playing their own single-player game and the goal of the game becomes to outlast the opponent. Therefore the play-out can be prematurely terminated by counting the number of squares captured by each player and then assigning a win to whoever has claimed the most space. The problem is that some positions might not offer a way back and therefore become suicide moves. For that reason a greedy wall-following algorithm can be used, which tries to fill out the remaining space. When both players have filled their space, the moves which were made are counted and the player with the higher move count wins. This approach was proposed by Den Teuling~\cite{teuling_tron}. % and is used in Subsection~\ref{subsec:pes} and~\ref{subsec:play_out_cut_off}.
+Tron is played in a grid-like environment and often the two players become separated from each other. When this happens, each agent is essentially playing their own single-player game and the goal of the game becomes to outlast the opponent. Therefore the play-out can be prematurely terminated by counting the number of squares captured by each player and then assigning a win to whoever has claimed the most space. The problem is that some positions might not offer a way back and therefore become suicide moves. For that reason a greedy wall-following algorithm can be used, which tries to fill out the remaining space. When both players have filled their space, the moves which were made are counted and the player with the higher move count wins. This approach was proposed by Den Teuling~\cite{teuling_tron}. % and is used in Subsection~\ref{subsec:pes} and~\ref{subsec:play_out_cut_off}.
 
 %\subsubsection*{Predictive Expansion Strategy}
 %\label{subsec:pes}
@@ -214,14 +221,14 @@ The parameter $C$ is usually tuned to increase performance. Sequential UCT was f
 %\subsection{Sequential UCB1-Tuned}
 %\label{subsec:ucb1_tuned}
 
-An enhancement to the UCT selection strategy can be made by replacing the parameter $C$ by an upper bound of the variance of the rewards \cite{cig_paper}. This is either $\frac{1}{4}$, which is an upper bound of the variance of a \emph{Bernoulli} random variable, or an upper confidence bound computed using Equation~\ref{ucb1tuned} which has the parameters the parent node $j$ and some child node $i$.
+An enhancement to the UCT selection strategy can be made by replacing the parameter $C$ by an upper bound of the variance of the rewards \cite{cig_paper}. This is either $\frac{1}{4}$, which is an upper bound of the variance of a \emph{Bernoulli} random variable, or an upper confidence bound computed using Equation~\ref{ucb1tuned} which have the parameters the parent node $j$ and some child node $i$.
 This variant is referred to as UCB1-Tuned~\cite{auer_et_al}.
 Then, a child node $k$ is selected from parent node $j$:
 
 \begin{equation}\label{ucb1tuned}
-k = \argmax_{i \in K} \left\{ \bar{X}_{i} + \sqrt{\frac{\min(\frac{1}{4},\mbox{Var}_{UCB1}(j,i)) \ln (n_{j})}{n_{i}}} \right\}, 
+k = \argmax_{i \in K} \left\{ \bar{X}_{i} + \sqrt{\frac{\min(\frac{1}{4},\mathrm{Var}_{\mathit{UCB1}}(j,i)) \ln (n_{j})}{n_{i}}} \right\}, 
 \mbox{ \hspace{0.1cm} } 
-\mbox{Var}_{UCB1}(j,i)=\bar{s} ^2_{k}+\sqrt{\frac{2 \ln (n_{j})}{n_{i}}},
+\mbox{Var}_{\mathit{UCB1}}(j,i)=\bar{s} ^2_{k}+\sqrt{\frac{2 \ln (n_{j})}{n_{i}}},
 \end{equation}
 where $\bar{s} ^2_{k}$ is the sample variance of the observed rewards for child node $k$. 
 
@@ -231,13 +238,14 @@ where $\bar{s} ^2_{k}$ is the sample variance of the observed rewards for child 
 \subsection{Decoupled UCT}
 \label{subsec:duct}
 
-Unlike standard sequential UCT and UCB1-Tuned used in the sequential tree model, Decoupled UCT (DUCT) applies UCB1 selection in the stacked matrix model for each player separately.
+Unlike standard sequential UCT and UCB1-Tuned used in the sequential tree model, 
+Decoupled UCT (DUCT) applies UCB1 selection in the stacked matrix model for each player separately.
 %In fact, the representation of a node is changed. \
-In DUCT a node stores the both moves, the one from Player 1 and from Player 2. 
-UCB1 selects a move twice, once for each player, and independently of the other player's choice.  
+In DUCT, a node stores both moves, the one from Player 1 and from Player 2. 
+Two moves are selected, one for each player, using separate instances of UCB, each independent of the other player's choice.  
 To better illustrate the difference between these two concepts, see Figure~\ref{fig:suct_vs_duct}. In the left figure, the sequential tree model is shown. In the right figure, each node contains two moves, one belonging to Player 1 and one to Player 2. These combinations are called {\it joint moves}. Because each level in the search tree represents now one step in the game, the branching factor is nine instead of three.
 
-When selecting a child node, DUCT applies the default UCB1 algorithm which was described in Equation~\ref{uct} with the statistics from each player's perspective independently. After a move is selected Player 1, the selection process is repeated for Player 2 (without knowledge of the choice made by Player 1) using the statistics from Player 2's perspective. These two moves are combined to form a joint move.
+When selecting a child node, DUCT applies the default UCB1 algorithm which was described in Equation~\ref{uct} with the statistics from each player's perspective independently. After a move is selected for Player 1, the selection process is repeated for Player 2 (without knowledge of the choice made by Player 1) using the statistics from Player 2's perspective. These two moves are combined to form a joint move.
 %Afterwards it combines the result of Player 2, for instance the move which represents the move ``right'' and chooses the child node which contains the joint-action [L,R].\\
 The final move to be played, after many simulations, can be selected in two different ways. The first, DUCT(max), selects the move with the most visits. 
 DUCT(mix) normalizes the visit counts and samples a move according to this distribution, \ie using a mixed strategy \cite{mcts_goofspiel}. 
@@ -270,12 +278,12 @@ Just as an enhancement can be made by replacing the parameter $C$ by an upper bo
 \label{subsec:exp3}
 
 To this point, except for the final move selection in DUCT(mix), policies for selecting moves have been deterministic. Exp3~\cite{Exp3} belongs to the group of stochastic selection strategies, which means that there is a random factor involved and instead moves are sampled according to some probability distribution. %that we cannot tell deterministically beforehand which action is going to be chosen. 
-Exp3, as DUCT, always uses the stacked matrix model and hence selects joint move.
+Exp3, as DUCT, always uses the stacked matrix model and hence selects a joint move.
 Exp3 stores a list of estimated sums of rewards $\hat{X}_{a^{p}_{k}}$, where $a^{p}_{k}$ refers to player $p$'s move $k$. From the list of payoffs, a policy $P$ is created. The probability of choosing move $a^{p}_{k}$ of policy $P$ is shown in Equation~\ref{exp3_equations}, 
 
 \begin{equation}\label{exp3_equations}
 %P_{a^{p}_{k}}=\frac{e^{\hat{X}_{a^{p}_{k}}}}{\sum\limits_{i \in K_{p}}e^{\hat{X}_{a^{p}_{i}}}},
-P_{a^{p}_{k}}=\frac{e^{\eta\omega(a^{p}_{k})}}{\sum\limits_{i \in A_{p}}e^{\eta\omega(a^{p}_{i})}}, 
+P_{a^{p}_{k}}=\frac{e^{\eta\omega(a^{p}_{k})}}{\sum\limits_{i \in K_{p}}e^{\eta\omega(a^{p}_{i})}}, 
 \mbox{\hspace{1cm}}
 \hat{X}_{a^{p}_{k}} = \hat{X}_{a^{p}_{k}} + \frac{r^{p}_{a_{k_{1}},a_{k_{2}}}}{\sigma_{a^{p}_{k}}},
 \end{equation}
@@ -283,7 +291,7 @@ where $K_{p}$ is the set of moves from player $p$, $\omega$ can be scaled by som
 As in~\cite{mcts_goofspiel}, we set $\eta = \gamma / |K_p|$. 
 %For simplicity, $\eta=1$ is chosen. 
 In standard Exp3, $\omega(a^p_k) = \hat{X}_{a^p_k}$, but in practice we use $\omega(a^{p}_{k} ) = \hat{X}_{a^{p}_{k}} - \argmax_{i \in K_{p}}\hat{X}_{a^{p}_{i}}$ since it is equivalent and more numerically stable~\cite{mcts_goofspiel}.
-The move selected is then sampled from the mixed strategy where move $a^p_k$ is selected with probability $\sigma_{a^{p}_{k}}=(1-\gamma)  P_{a^{p}_{k}} + \frac{\gamma}{|K_{p}|}$.
+The move selected is then sampled from the mixed strategy where move $a^p_k$ is selected with probability $\sigma_{a^{p}_{k}} = (1 - \gamma)  P_{a^{p}_{k}} + \frac{\gamma}{|K_{p}|}$.
 
 %Since Equation~\ref{exp3_policy} leads to numerical instability, Equations~\ref{exp3_policy_new} and~\ref{exp3_policy_weight} are used instead. From this policy, a probability $\sigma_{a^{p}_{k}}$ is computed (See Equation~\ref{exp3_distribution}) from which a mixed strategy is played. 
 %Otherwise $\eta$ can be tuned to increase the performance of Exp3.
@@ -306,7 +314,7 @@ As in DUCT(mix), the final move is sampled from the normalized visit count distr
 
 \subsection{Regret Matching}
 \label{subsec:rm}
-Regret Matching (RM)~\cite{Hart00}, as Exp3 and DUCT, selects always joint move. Opposed to the other strategies, Regret Matching stores a matrix $M$ with the estimated mean of the rewards (See Equation~\ref{rm_equations}, where $\bar{X}_{m,n}$ is the mean of the rewards for Player 1 when the joint move $(a_{1}=m,a_{2}=n)$ was selected).
+Regret Matching (RM)~\cite{Hart00}, as Exp3 and DUCT, always selects a joint move. Opposed to the other strategies, Regret Matching stores a matrix $M$ with the estimated mean of the rewards (See Equation~\ref{rm_equations}, where $\bar{X}_{m,n}$ is the mean of the rewards for Player 1 when the joint move $(a_{1}=m,a_{2}=n)$ was selected):
 
 \begin{equation}
 \label{rm_equations}
@@ -318,8 +326,8 @@ M =
 \end{bmatrix}
 \mbox{ \hspace{1cm} }
 \begin{array}{c}
-\forall a^{1}_{i} \in K_{1}, R_{a^{1}_{i}} = R_{a^{1}_{i}} + (reward^1_{i,n} - r^{1}_{a_{m},a_{n}})\\
-\forall a^{2}_{i} \in K_{2}, R_{a^{2}_{i}} = R_{a^{2}_{i}} + (reward^2_{m,i} - r^{2}_{a_{m},a_{n}})
+\mbox{for all } a^{1}_{i} \in K_{1}, R_{a^{1}_{i}} \leftarrow R_{a^{1}_{i}} + (reward^1_{i,n} - r^{1}_{a_{m},a_{n}})\\
+\mbox{for all } a^{2}_{i} \in K_{2}, R_{a^{2}_{i}} \leftarrow R_{a^{2}_{i}} + (reward^2_{m,i} - r^{2}_{a_{m},a_{n}})
 \end{array}
 \end{equation}
 
@@ -338,7 +346,7 @@ where the variable $\gamma$ can be tuned to increase performance as in Exp3.
 %\sigma_{a^{p}_{k}}=(1-\gamma) P_{a^{p}_{k}} + \frac{\gamma}{|A_{p}|}
 %\end{equation}
 
-Initially, all values in matrix $M$ and all values in the regret lists are set to zero. After the play-out is finished and the result ($r^{p}_{a_{m},a_{n}}$) for player $p$ gets back propagated, the cumulative reward values for each cell are updated using $X_{m,n} = X_{m,n} + r^{p}_{a^{1}_{m},a^{2}_{n}}$ and the regret values are updated using the right side of Equation~\ref{rm_equations},
+Initially, all values in matrix $M$ and all values in the regret lists are set to zero. After the play-out is finished and the result ($r^{p}_{a_{m},a_{n}}$) for player $p$ gets backpropagated, the cumulative reward values for each cell are updated using $X_{m,n} = X_{m,n} + r^{p}_{a^{1}_{m},a^{2}_{n}}$ and the regret values are updated using the right side of Equation~\ref{rm_equations},
 where $reward^p_{m',n'} = r^p_{a_m,a_n}$ if $(m',n') = (m,n)$ or $\bar{X}_{m,n}$ otherwise.
 The final move is selected using the average of all the mixed strategies used over all simulations as described in~\cite{mcts_goofspiel}. 
 %in DUCT(mix) and Exp3 by sampling from the mixed strategy of normalized visit counts. 
@@ -365,7 +373,7 @@ In this section the MCTS variants are evaluated.
 In order to make it a fair comparison between the two search tree models using a common implementation, each agent is allowed to simulate a fixed number of simulations (100,000) which took roughly one second on an AMD Opteron 6174 running at 2.2 Ghz.
 
 %In the case of this experiment the number is set to 100,000. 
-The experiments are run on four different boards, three with obstacles (see Figure~\ref{fig:boards-example}) and an empty board (d)), all with dimensions of $13 \times 13$. On each board 500 games are played per player matchup, with sides swapped halfway through.
+The experiments are run on four different boards, three with obstacles (see Figure~\ref{fig:boards-example} (a), (b), and (c)) and an empty board (d), all with dimensions of $13 \times 13$. On each board 500 games are played per player matchup, with sides swapped halfway. % through.
 %to assure that none of the agents are benefiting from starting in a certain position. 
 The play-out strategy, which is used in all experiments, is the random strategy with play-out cut-offs enhancement mentioned in Section~\ref{sec:tron_specific_mcts}. 
 However, to avoid slowing down playouts too much, they are only applied every 10 steps. 
@@ -473,7 +481,7 @@ The predictive expansion strategy is also used.
 \end{tabular}
 %\caption{Results of the different selection strategies playing on Board a,b,c and d.}
 \caption{Results of the different variants playing on boards a, b, c and d. 
-Each percentage refers to the win rate of the row player. \label{table:round_robin}}
+Percentages refer to the win rate of the row player. \label{table:round_robin}}
 %UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching;
 \end{table}
 
@@ -502,7 +510,7 @@ Each percentage refers to the win rate of the row player. \label{table:round_rob
 %  RM		 	      & 36\% 	& 37\%		& 40\%		  & 51\%		& 33\%		& 48\%		& 48\%	& -				    \\ 	\hline
 \end{tabular}
 \caption{Overall results of the different variants playing against each other over all boards.
-Each percentage refers to the win rate of the row player. }
+Percentages refer to the win rate of the row player. }
 %Here, UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching}
 \label{table:round_robin_total}
 \end{table}
@@ -532,7 +540,7 @@ Each percentage refers to the win rate of the row player. }
 %	Exp3			          & 41\%		& 44\%		& 38\%		& 43\%		& 42 $\pm$ 1.29\%		\\ \hline
 %	Regret Matching		  & 41\%		& 44\%		& 39\%		& 40\%		& 41 $\pm$ 1.28\%		\\ \hline
 \end{tabular}
-\caption{Results of the different variants played against each other. $\pm$ refers to 95\% confidence intervals. \label{tbl:overall-avgs}}
+\caption{Results of the different variants played against each other; $\pm$ refers to 95\% confidence intervals. \label{tbl:overall-avgs}}
 \end{minipage}
 ~~~~~
 \begin{minipage}{.4\textwidth}
@@ -541,7 +549,7 @@ Each percentage refers to the win rate of the row player. }
 \begin{tabular}{|c||c|c|}
 							\hline
 Parameter			& Reference constant(s)                             & Tuned value	\\ \hline\hline
-    $C$				& $10,3.52$ from~\cite{teuling_tron,cig_paper}	& $1.5$		\\ \hline
+    $C$				& $10$ and $3.52$ from~\cite{teuling_tron,cig_paper}	& $1.5$		\\ \hline
 %$T$				& 30~\cite{teuling_tron}	& 30		\\ \hline
 $\gamma$(Exp3) & 0.36~\cite{cig_paper}		& 0.3		\\ \hline
 $\gamma$(Regret Matching)	& 0.025~\cite{mcts_goofspiel}				& 0.3		\\ \hline
@@ -576,7 +584,7 @@ $\gamma$(Regret Matching)	& 0.025~\cite{mcts_goofspiel}				& 0.3		\\ \hline
 %	Exp3							& 39\%		& 41\%	& 40\%			& 39\%				& 51\%			& 41\%				& 54\%& -			& 44 $\pm$ 2.60 \%		\\ \hline
 \end{tabular}
 \caption{Results of the different variants playing against each other on a $6\times6$ board. 
-Each percentage refers to the win rate of the row player, and $\pm$ refers to 95\% confidence intervals.}
+Percentages refer to the win rate of the row player, and $\pm$ refers to 95\% confidence intervals.}
 %\caption*{UCB1T=UCB1-Tuned, DUCB1T(max)=DUCB1-Tuned(max), DUCB1T(mix)=DUCB1-Tuned(mix), RM=Regret Matching}
 \label{table:rr_small}
 \end{table}
@@ -607,7 +615,7 @@ Table~\ref{tbl:overall-avgs} presents the average performance of each agent over
 
 %From this, we see that sequential UCT and UCB1-Tuned selection strategies perform best overall.
 From this, we see that the UCB1-Tuned variants perform best overall, with the decoupled version 
-winning significantly (7.5\%) more often than its next three competitors. 
+winning significantly (at least 7.5 percentage points) more often than its next three competitors. 
 Given that the top three players use UCB1-Tuned, including DUCB1T(mix), it appears that a better way of 
 performing exploration has a bigger impact on performance than the choice of the game model 
 (sequential versus stacked matrix).
@@ -625,10 +633,9 @@ where the advantage of the opponent's best counter-move is minimized. In fact, i
 value computed in this model 
 is a lower bound of the true optimal value~\cite{Bosansky13Using}. 
 
-As in Goofspiel~\cite{mcts_goofspiel}, Regret Matching outperforms Exp3 and DUCT(mix). 
+As in Goofspiel~\cite{mcts_goofspiel}, Regret Matching outperforms Exp3, DUCT(max), and DUCT(mix). 
 However unlike previous results in Goofspiel, Exp3 does not outperform 
-DUCT(max). This may be because in Tron mistakes are not forgiving in the sense that it is easy to 
-recognize and exploit suboptimal moves made by the opponent. 
+DUCT(max), possibly because mistakes caused by uncertainty in the final move selection are easy to recognize and exploit in Tron. 
 Also, results of the algorithms vary from board to board, which is consistent with previous 
 experiments in Tron~\cite{teuling_tron}. Board (b), for instance, can lead to many situations where 
 a mistake made is particular difficult to recover from. In this situation, the deterministic strategies
@@ -640,17 +647,19 @@ tend to perform better since they avoid mistakes.
 %sequential MCTS out performs the decoupled versions of MCTS.
 %
 The round-robin tournament was repeated on a smaller ($6 \times 6$) board. 
-From the results in Table~\ref{table:rr_small}, 
+From the tournament on the smaller $6 \times 6$ board, Table~\ref{table:rr_small}, 
 %generally the win rates get closer to 50\%.
 %Since the board smaller, most of the variants can often compute the optimal choice. 
 %we see that deterministic selection strategies are still doing better that stochastic 
 %ones, but nonetheless perform better on the smaller board than on the larger board.
-the tournament on the smaller $6 \times 6$ board the relative performance difference are less extreme, possibly
+the relative performance differences are less extreme, possibly
 because each one is acting closer to optimally and there is less opportunity to make mistakes.
 The deterministic strategies decrease and the performance of the stochastic strategies increase, with Regret Matching 
 performing best in the small board, possibly because the stochastic strategies are finding more situations where mixing 
 is important. 
-For example, in Figure~\ref{fig:boards-example} both players have two possible moves. If both players choose $a^{p}_{1}$ (``Up''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Down''), Player 1 also wins. The optimal strategy for both players is to play with a mixed strategy, where each move is chosen with probability $0.5$. 
+For example, in Figure~\ref{fig:boards-example} (right) both players have two possible moves. If both players 
+choose $a^{p}_{1}$ (``Up''), Player 1 wins and if both players choose $a^{p}_{2}$ (``Down''), Player 1 also wins. 
+The optimal strategy for both players is to play with a mixed strategy, where each move is chosen with probability $0.5$. 
 
 %\subsubsection*{Discussion}
 %\label{subsec:discussion}
@@ -670,7 +679,7 @@ For example, in Figure~\ref{fig:boards-example} both players have two possible m
 
 In this paper, several selection and backpropagation strategies were introduced for MCTS in Tron.
 %including Sequential and Decoupled UCT, Sequential and Decoupled UCB1-Tuned, Exp3 and Regret Matching. 
-The performance of these variants were obtained  the game of Tron on different boards.
+The performance of these variants was studied for four different boards.
 Overall, the UCB1-Tuned variants perform best. % in the game of Tron. 
 Furthermore deterministic strategies appear to perform generally better than the stochastic strategies in Tron.
 Experiments also suggest that board layout can influence performance.
@@ -685,7 +694,7 @@ the remaining probabilities.
 %This hybrid selection strategy would indicate, if the assumption made in this paper, that stochastic strategies perform better when both players are close to each other, is correct.
 
 \vspace{0.2cm}
-\noindent {\bf Acknowledgements} {\small This work is partially funded by MARBLE: Maastricht
+\noindent {\bf Acknowledgements.} {\small This work is partially funded by MARBLE: Maastricht
 Research Based Learning and the Netherlands Organisation
 for Scientific Research (NWO) in the framework of the project
 Go4Nature, grant number 612.000.938. }
